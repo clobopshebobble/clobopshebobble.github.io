@@ -843,6 +843,36 @@ var dinoGroups = [];
 
 function buildShapeDino(def) {
   var g = new THREE.Group();
+
+  // Ptero builds its own body — skip standard body parts
+  if (def.isPtero) {
+    var pb=new THREE.Mesh(new THREE.SphereGeometry(.65,8,6),makeMat(def.bodyColor));
+    pb.scale.set(1,.58,1.9); g.add(pb);
+    var ph=new THREE.Mesh(new THREE.SphereGeometry(.38,8,6),makeMat(def.bodyColor));
+    ph.position.set(0,.22,-1.1); g.add(ph);
+    var pbk=new THREE.Mesh(new THREE.CylinderGeometry(.055,.02,1,5),makeMat(def.darkColor));
+    pbk.rotation.x=Math.PI/2; pbk.position.set(0,.2,-1.82); g.add(pbk);
+    function makeWing(side){
+      var wg=new THREE.BufferGeometry();
+      var verts=new Float32Array([0,0,0,side*4.2,.3,-.2,side*3.8,0,-1.8,0,0,0,side*3.8,0,-1.8,side*.4,0,-1.4]);
+      wg.setAttribute('position',new THREE.BufferAttribute(verts,3)); wg.computeVertexNormals();
+      g.add(new THREE.Mesh(wg,new THREE.MeshLambertMaterial({color:def.bodyColor,side:THREE.DoubleSide})));
+    }
+    makeWing(1); makeWing(-1);
+    for(var ei=0;ei<2;ei++){
+      var es=[-1,1][ei];
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(.06,6,4),new THREE.MeshBasicMaterial({color:0xffee00}));
+      eye.position.set(es*.28,.38,-1.3); g.add(eye);
+      var pupil=new THREE.Mesh(new THREE.SphereGeometry(.035,5,4),new THREE.MeshBasicMaterial({color:0x080808}));
+      pupil.position.set(es*.3,.38,-1.45); g.add(pupil);
+    }
+    g.position.set(def.wx,16,def.wz);
+    g.userData={def:def,flyA:Math.random()*Math.PI*2,baseY:14,walkA:0,idleA:0};
+    g.traverse(function(m){if(m.isMesh){m.castShadow=true;m.receiveShadow=true;}});
+    scene.add(g);
+    return g;
+  }
+
   var bx=def.bodyScale[0], by=def.bodyScale[1], bz=def.bodyScale[2];
 
   var body=new THREE.Mesh(new THREE.SphereGeometry(1,9,7),makeMat(def.bodyColor));
@@ -913,26 +943,8 @@ function buildShapeDino(def) {
     }
   }
 
-  if(def.isPtero){
-    var pb=new THREE.Mesh(new THREE.SphereGeometry(.65,8,6),makeMat(def.bodyColor));
-    pb.scale.set(1,.58,1.9); g.add(pb);
-    var ph=new THREE.Mesh(new THREE.SphereGeometry(.38,8,6),makeMat(def.bodyColor));
-    ph.position.set(0,.22,-1.1); g.add(ph);
-    var pbk=new THREE.Mesh(new THREE.CylinderGeometry(.055,.02,1,5),makeMat(def.darkColor));
-    pbk.rotation.x=Math.PI/2; pbk.position.set(0,.2,-1.82); g.add(pbk);
-    function makeWing(side){
-      var wg=new THREE.BufferGeometry();
-      var verts=new Float32Array([0,0,0,side*4.2,.3,-.2,side*3.8,0,-1.8,0,0,0,side*3.8,0,-1.8,side*.4,0,-1.4]);
-      wg.setAttribute('position',new THREE.BufferAttribute(verts,3)); wg.computeVertexNormals();
-      g.add(new THREE.Mesh(wg,new THREE.MeshLambertMaterial({color:def.bodyColor,side:THREE.DoubleSide})));
-    }
-    makeWing(1); makeWing(-1);
-    g.position.set(def.wx,16,def.wz);
-    g.userData={def:def,flyA:Math.random()*Math.PI*2,baseY:14,walkA:0,idleA:0};
-  } else {
-    g.position.set(def.wx,0,def.wz);
-    g.userData={def:def,flyA:0,baseY:0,walkA:Math.random()*Math.PI*2,idleA:Math.random()*Math.PI*2};
-  }
+  g.position.set(def.wx,0,def.wz);
+  g.userData={def:def,flyA:0,baseY:0,walkA:Math.random()*Math.PI*2,idleA:Math.random()*Math.PI*2};
 
   g.traverse(function(m){if(m.isMesh){m.castShadow=true;m.receiveShadow=true;}});
   scene.add(g);

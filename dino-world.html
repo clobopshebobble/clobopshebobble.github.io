@@ -327,10 +327,11 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
 renderer.toneMapping       = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
+renderer.setClearColor(0x87ceeb);
 renderer.outputEncoding    = THREE.sRGBEncoding;
 
 var scene  = new THREE.Scene();
-scene.fog  = new THREE.FogExp2(0x2a4a15, 0.038);
+scene.fog  = new THREE.FogExp2(0x87ceeb, 0.032);
 
 var camera = new THREE.PerspectiveCamera(70, gw.clientWidth / gw.clientHeight, 0.1, 200);
 
@@ -357,8 +358,8 @@ scene.add(fillLight);
   var geo    = new THREE.SphereGeometry(180, 12, 8);
   var colArr = [];
   var pos    = geo.attributes.position;
-  var topC   = new THREE.Color(0x1a5090);
-  var botC   = new THREE.Color(0x70b060);
+  var topC   = new THREE.Color(0x2276c8);
+  var botC   = new THREE.Color(0x87ceeb);
   for (var i = 0; i < pos.count; i++) {
     var t = Math.max(0, Math.min(1, (pos.getY(i) + 100) / 200));
     var c = topC.clone().lerp(botC, 1 - t);
@@ -554,16 +555,22 @@ var DINO_DEFS = [
     fact:'Chompy has the BIGGEST bite of any land animal ever! His arms are tiny but he thinks they are very cool and stylish.',
     wx:4.5*TILE, wz:4.5*TILE,
     modelFile:'https://clobopshebobble.github.io/cute_dino.glb', modelScale:1.5, modelY:0,
+    bodyColor:0x3a5a28, darkColor:0x223a18,
+    bodyScale:[1.3,1.0,2.2], legH:1.8, legW:0.42, neckLen:0.8,
+    headW:0.88, headH:0.7, tailLen:2.6, biped:true,
     found:false },
   { id:'trice',   name:'Trixie',      era:'The Three-Horned Cutie 🌸', icon:'🦕',
     fact:'Trixie has THREE horns and a big beautiful frill that turns pink when she is happy! She loves flowers and head-booping her friends.',
     wx:23.5*TILE, wz:4.5*TILE,
     modelFile:'https://clobopshebobble.github.io/cute_red_childrens_dino.glb', modelScale:1.5, modelY:0,
+    bodyColor:0x6a7040, darkColor:0x4a5028,
+    bodyScale:[1.7,1.0,3.0], legH:1.3, legW:0.44, neckLen:0.5,
+    headW:1.3, headH:0.85, tailLen:1.4, biped:false, hasFrill:true,
     found:false },
   { id:'brachio', name:'Noodleneck',  era:'The Tallest Noodle 🍜', icon:'🦕',
     fact:'Noodleneck has the longest neck in the WHOLE park and can eat leaves from the very tippy top of trees! She loves tickling birds with her nose.',
     wx:14*TILE, wz:11.5*TILE,
-    sketchfabId:'32900e4ffee0490ea692ace2ca8c7c0f',
+    modelFile:'https://clobopshebobble.github.io/Dinosaur.glb', modelScale:3.0, modelY:0,
     bodyColor:0x5a7840, darkColor:0x3a5828,
     bodyScale:[2.0,1.5,3.5], legH:2.5, legW:0.50, neckLen:4.5,
     headW:0.65, headH:0.52, tailLen:2.2, biped:false, isLongNeck:true,
@@ -571,6 +578,7 @@ var DINO_DEFS = [
   { id:'raptor',  name:'Claw',        era:'The Sneaky Speedster 💨', icon:'🦖',
     fact:'Claw is super fast and extra clever! She and her friends make up secret plans together. She is also secretly very cuddly but do NOT tell anyone.',
     wx:4.5*TILE, wz:22.5*TILE,
+    modelFile:'https://clobopshebobble.github.io/Cute_Red_Dino.glb', modelScale:2.0, modelY:0,
     bodyColor:0x7a6858, darkColor:0x5a4838,
     bodyScale:[0.7,0.65,1.4], legH:1.1, legW:0.22, neckLen:0.7,
     headW:0.52, headH:0.44, tailLen:1.9, biped:true,
@@ -901,6 +909,99 @@ function stopEncModel() {
   if (box) box.innerHTML = '';
 }
 
+
+// ═══════════════════════════════════════════════════════
+//  CHICK DECORATIONS — little chickens wandering the park!
+// ═══════════════════════════════════════════════════════
+var CHICK_SPOTS = [
+  {wx:8*TILE,  wz:8*TILE},
+  {wx:20*TILE, wz:8*TILE},
+  {wx:6*TILE,  wz:14*TILE},
+  {wx:20*TILE, wz:14*TILE},
+  {wx:11*TILE, wz:20*TILE},
+  {wx:16*TILE, wz:20*TILE},
+  {wx:8*TILE,  wz:24*TILE},
+  {wx:20*TILE, wz:24*TILE},
+];
+var chickGroups = [];
+
+loader.load('https://clobopshebobble.github.io/Chick.glb',
+  function(gltf) {
+    CHICK_SPOTS.forEach(function(spot, i) {
+      var chick = gltf.scene.clone();
+      // Auto-scale
+      var box = new THREE.Box3().setFromObject(chick);
+      var sz = new THREE.Vector3(); box.getSize(sz);
+      var maxD = Math.max(sz.x, sz.y, sz.z);
+      var sc = 0.5 / maxD;
+      chick.scale.set(sc, sc, sc);
+      box.setFromObject(chick);
+      chick.position.set(spot.wx, -box.min.y, spot.wz);
+      chick.rotation.y = Math.random() * Math.PI * 2;
+      chick.traverse(function(m) { if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
+      chick.userData = { bobPhase: Math.random()*Math.PI*2, baseY: -box.min.y, wanderA: Math.random()*Math.PI*2 };
+      scene.add(chick);
+      chickGroups.push(chick);
+    });
+    console.log('Chicks loaded! 🐣');
+  },
+  null,
+  function(err) { console.warn('Chick load failed, skipping decorations'); }
+);
+
+
+// ═══════════════════════════════════════════════════════
+//  PAPER PLANE — flies in big loops over the park!
+// ═══════════════════════════════════════════════════════
+var paperPlane = null;
+var planeAngle = 0;
+var planeTilt  = 0;
+
+loader.load('https://clobopshebobble.github.io/Paper_Plane.glb',
+  function(gltf) {
+    paperPlane = gltf.scene;
+    var box = new THREE.Box3().setFromObject(paperPlane);
+    var sz = new THREE.Vector3(); box.getSize(sz);
+    var maxD = Math.max(sz.x, sz.y, sz.z);
+    var sc = 2.5 / maxD;
+    paperPlane.scale.set(sc, sc, sc);
+    paperPlane.position.set(14*TILE, 18, 14*TILE);
+    paperPlane.traverse(function(m) { if(m.isMesh){ m.castShadow=true; } });
+    scene.add(paperPlane);
+    console.log('Paper plane loaded! ✈️');
+  },
+  null,
+  function(err) { console.warn('Paper plane load failed'); }
+);
+
+
+// ═══════════════════════════════════════════════════════
+//  PAPER PLANE — flies lazy circles around the park!
+// ═══════════════════════════════════════════════════════
+var planeGroup = null;
+var planeAngle = 0;
+var PLANE_RADIUS = 10 * TILE;
+var PLANE_CX = 14 * TILE;
+var PLANE_CZ = 14 * TILE;
+var PLANE_Y  = 9;
+var PLANE_SPEED = 0.25;
+
+loader.load('https://clobopshebobble.github.io/Paper_Plane.glb',
+  function(gltf) {
+    planeGroup = gltf.scene;
+    var box = new THREE.Box3().setFromObject(planeGroup);
+    var sz = new THREE.Vector3(); box.getSize(sz);
+    var maxD = Math.max(sz.x, sz.y, sz.z);
+    var sc = 1.8 / maxD;
+    planeGroup.scale.set(sc, sc, sc);
+    planeGroup.traverse(function(m) { if(m.isMesh){ m.castShadow=true; } });
+    scene.add(planeGroup);
+    console.log('Paper plane loaded! ✈️');
+  },
+  null,
+  function(err) { console.warn('Paper plane load failed'); }
+);
+
 // ═══════════════════════════════════════════════════════
 //  PLAYER
 // ═══════════════════════════════════════════════════════
@@ -928,12 +1029,17 @@ function tryMove(nx, nz) {
   }
 }
 function movePlayer(dt) {
-  var spd=MOVE_SPEED*dt*60;
-  var cos=Math.cos(playerAngle), sin=Math.sin(playerAngle);
-  if(keys['ArrowUp']   ||keys['w']||keys['W']) tryMove(playerPos.x+cos*spd, playerPos.z+sin*spd);
-  if(keys['ArrowDown'] ||keys['s']||keys['S']) tryMove(playerPos.x-cos*spd, playerPos.z-sin*spd);
-  if(keys['ArrowLeft'] ||keys['a']||keys['A']) playerAngle-=TURN_SPEED*dt*60;
-  if(keys['ArrowRight']||keys['d']||keys['D']) playerAngle+=TURN_SPEED*dt*60;
+  var spd = MOVE_SPEED * dt * 60;
+  // Turn first
+  if(keys['ArrowLeft'] ||keys['a']||keys['A']) playerAngle -= TURN_SPEED*dt*60;
+  if(keys['ArrowRight']||keys['d']||keys['D']) playerAngle += TURN_SPEED*dt*60;
+  // Pull forward vector straight from the camera so movement & view always match
+  var dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+  dir.y = 0;
+  dir.normalize();
+  if(keys['ArrowUp']   ||keys['w']||keys['W']) tryMove(playerPos.x + dir.x*spd, playerPos.z + dir.z*spd);
+  if(keys['ArrowDown'] ||keys['s']||keys['S']) tryMove(playerPos.x - dir.x*spd, playerPos.z - dir.z*spd);
 }
 
 // ── Nearby + Interact ─────────────────────────────────
@@ -1084,6 +1190,46 @@ function animate(){
   if(gameRunning){
     movePlayer(dt);
     checkNearby();
+    // Animate chicks — bob and slowly turn
+    for(var ci=0;ci<chickGroups.length;ci++){
+      var chk=chickGroups[ci], ud=chk.userData;
+      ud.bobPhase+=dt*2.5;
+      ud.wanderA+=dt*0.3;
+      chk.position.y=ud.baseY+Math.abs(Math.sin(ud.bobPhase))*0.08;
+      chk.rotation.y+=dt*0.4;
+    }
+    // Animate paper plane — lazy circles with gentle banking and bobbing
+    if(planeGroup){
+      planeAngle += dt * PLANE_SPEED;
+      var px3 = PLANE_CX + Math.cos(planeAngle) * PLANE_RADIUS;
+      var pz3 = PLANE_CZ + Math.sin(planeAngle) * PLANE_RADIUS;
+      var py3 = PLANE_Y + Math.sin(planeAngle * 1.5) * 1.5;
+      planeGroup.position.set(px3, py3, pz3);
+      // Face direction of travel
+      planeGroup.rotation.y = -planeAngle - Math.PI * 0.5;
+      // Bank into the turn
+      planeGroup.rotation.z = 0.35;
+      // Gentle nose pitch with the bob
+      planeGroup.rotation.x = Math.sin(planeAngle * 1.5) * 0.15;
+    }
+    // Animate paper plane — big sweeping loop over the park
+    if(paperPlane) {
+      planeAngle += dt * 0.55;
+      var cx = 14*TILE, cz = 14*TILE;
+      var radius = 28;
+      var px3 = cx + Math.cos(planeAngle) * radius;
+      var pz3 = cz + Math.sin(planeAngle) * radius;
+      var py3 = 16 + Math.sin(planeAngle * 1.3) * 4;
+      paperPlane.position.set(px3, py3, pz3);
+      // Point plane in direction of travel
+      var nextA = planeAngle + 0.05;
+      var nx3 = cx + Math.cos(nextA) * radius;
+      var nz3 = cz + Math.sin(nextA) * radius;
+      paperPlane.lookAt(nx3, py3 + Math.sin((planeAngle+0.05)*1.3)*4 - py3 + py3, nz3);
+      // Gentle banking tilt
+      planeTilt = Math.sin(planeAngle * 2) * 0.35;
+      paperPlane.rotateOnWorldAxis(new THREE.Vector3(0,0,1), planeTilt * 0.03);
+    }
     if(toastTimer>0){toastTimer--;if(!toastTimer)document.getElementById('toast').style.display='none';}
 
     for(var i=0;i<dinoGroups.length;i++){
@@ -1118,8 +1264,8 @@ function animate(){
 
   camera.position.copy(playerPos);
   camera.rotation.order='YXZ';
-  camera.rotation.y=-playerAngle;
-  camera.rotation.x=0;
+  camera.rotation.y = -playerAngle;
+  camera.rotation.x = 0;
   renderer.render(scene,camera);
   drawMinimap();
 }

@@ -29,7 +29,6 @@
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E🐥%3C/text%3E%3C/svg%3E") 4 4, auto;
   }
 
-  /* Animated sky background */
   .sky-bg {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -64,7 +63,6 @@
   .c3 { width:180px; height:50px; top:5%;  animation-duration:35s; animation-delay:-20s; }
   .c4 { width:120px; height:36px; top:25%; animation-duration:30s; animation-delay:-8s; }
 
-  /* Floating emoji decorations */
   .floaty {
     position: fixed;
     font-size: 28px;
@@ -84,7 +82,6 @@
   .f5  { top:85%;  left:5%;   animation-delay:0.4s;  font-size:22px; }
   .f6  { top:45%;  right:2%;  animation-delay:1.8s;  font-size:28px; }
 
-  /* Main content */
   .content {
     position: relative;
     z-index: 2;
@@ -93,7 +90,6 @@
     padding: 0 20px 80px;
   }
 
-  /* Header */
   header {
     text-align: center;
     padding: 48px 20px 32px;
@@ -104,9 +100,7 @@
     font-family: 'Fredoka One', cursive;
     font-size: clamp(42px, 8vw, 80px);
     color: white;
-    text-shadow:
-      4px 4px 0 var(--duck),
-      8px 8px 0 rgba(0,0,0,0.12);
+    text-shadow: 4px 4px 0 var(--duck), 8px 8px 0 rgba(0,0,0,0.12);
     line-height: 1.1;
     letter-spacing: 1px;
     animation: titleBounce 0.6s cubic-bezier(.36,.07,.19,.97) both;
@@ -140,7 +134,6 @@
     50%      { transform: rotate(8deg); }
   }
 
-  /* Section label */
   .section-label {
     font-family: 'Fredoka One', cursive;
     font-size: 28px;
@@ -155,7 +148,6 @@
     box-shadow: 0 4px 0 rgba(0,0,0,0.08);
   }
 
-  /* Game grid */
   .games-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -198,7 +190,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 64px;
     position: relative;
     overflow: hidden;
   }
@@ -207,7 +198,7 @@
     opacity: 0.18;
     font-size: 48px;
   }
-  .card-banner .bg-emoji:nth-child(1) { top:-5px;  left:-5px;  }
+  .card-banner .bg-emoji:nth-child(1) { top:-5px;  left:-5px; }
   .card-banner .bg-emoji:nth-child(2) { bottom:-5px; right:-5px; }
   .card-banner .bg-emoji:nth-child(3) { top: 50%; left: 5px; transform:translateY(-50%); }
   .card-banner .bg-emoji:nth-child(4) { top: 50%; right: 5px; transform:translateY(-50%); }
@@ -223,14 +214,12 @@
     50%      { transform: translateY(-8px); }
   }
 
-  .b-duck   { background: linear-gradient(135deg, #FFE566 0%, #FFB347 100%); }
-  .b-dino   { background: linear-gradient(135deg, #A8F5A0 0%, #34D399 100%); }
-  .b-ocean  { background: linear-gradient(135deg, #87CEEB 0%, #4A90D9 100%); }
-  .b-magic  { background: linear-gradient(135deg, #F9A8D4 0%, #C084FC 100%); }
+  .b-duck  { background: linear-gradient(135deg, #FFE566 0%, #FFB347 100%); }
+  .b-dino  { background: linear-gradient(135deg, #A8F5A0 0%, #34D399 100%); }
+  .b-ocean { background: linear-gradient(135deg, #87CEEB 0%, #4A90D9 100%); }
+  .b-magic { background: linear-gradient(135deg, #F9A8D4 0%, #C084FC 100%); }
 
-  .card-body {
-    padding: 16px 20px 20px;
-  }
+  .card-body { padding: 16px 20px 20px; }
   .card-title {
     font-family: 'Fredoka One', cursive;
     font-size: 22px;
@@ -257,18 +246,17 @@
     border-radius: 20px;
     letter-spacing: 0.3px;
   }
-  .tag-duck   { background:#FFF0CC; color:#B07000; }
-  .tag-dino   { background:#DCFCE7; color:#166534; }
-  .tag-ocean  { background:#DBEAFE; color:#1e40af; }
-  .tag-fun    { background:#FCE7F3; color:#9d174d; }
-  .tag-hard   { background:#FEE2E2; color:#991b1b; }
-  .tag-fart   { background:#FEF9C3; color:#854d0e; }
+  .tag-duck  { background:#FFF0CC; color:#B07000; }
+  .tag-dino  { background:#DCFCE7; color:#166534; }
+  .tag-ocean { background:#DBEAFE; color:#1e40af; }
+  .tag-fun   { background:#FCE7F3; color:#9d174d; }
+  .tag-hard  { background:#FEE2E2; color:#991b1b; }
+  .tag-fart  { background:#FEF9C3; color:#854d0e; }
 
   .play-btn {
     display: block;
     width: 100%;
     padding: 12px;
-    background: var(--dark);
     color: white;
     font-family: 'Fredoka One', cursive;
     font-size: 18px;
@@ -279,23 +267,17 @@
     transition: background 0.15s, transform 0.1s;
     letter-spacing: 0.5px;
   }
-  .play-btn:hover   { background: #3D2B99; }
-  .play-btn:active  { transform: scale(0.97); }
+  .play-btn:active { transform: scale(0.97); }
+  .duck-btn  { background: #E07800; }
+  .duck-btn:hover  { background: #C06600; }
+  .dino-btn  { background: #059669; }
+  .dino-btn:hover  { background: #047857; }
+  .ocean-btn { background: #1d6fa8; }
+  .ocean-btn:hover { background: #155e87; }
+  .magic-btn { background: #7c3aed; }
+  .magic-btn:hover { background: #6d28d9; }
 
-  .play-btn.duck-btn   { background: #E07800; }
-  .play-btn.duck-btn:hover { background: #C06600; }
-  .play-btn.dino-btn   { background: #059669; }
-  .play-btn.dino-btn:hover { background: #047857; }
-  .play-btn.ocean-btn  { background: #1d6fa8; }
-  .play-btn.ocean-btn:hover { background: #155e87; }
-  .play-btn.magic-btn  { background: #7c3aed; }
-  .play-btn.magic-btn:hover { background: #6d28d9; }
-
-  /* Coming soon card */
-  .card-soon {
-    opacity: 0.7;
-    pointer-events: none;
-  }
+  .card-soon { opacity: 0.7; pointer-events: none; }
   .soon-badge {
     position: absolute;
     top: 12px; right: 12px;
@@ -309,7 +291,6 @@
     z-index: 2;
   }
 
-  /* Footer */
   footer {
     text-align: center;
     padding: 30px 20px;
@@ -319,7 +300,6 @@
     opacity: 0.7;
   }
 
-  /* Grass strip at bottom */
   .grass-strip {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -336,7 +316,6 @@
     border-radius: 50% 50% 0 0 / 100% 100% 0 0;
   }
 
-  /* Stars sprinkled around */
   .star {
     position: fixed;
     font-size: 18px;
@@ -385,7 +364,7 @@
 <div class="content">
   <header>
     <div class="site-title">🐥 Chloe's Game World!</div>
-    <div class="site-subtitle">Made by Chloe & Claude 🤝</div>
+    <div class="site-subtitle">Made by Chloe &amp; Claude 🤝</div>
     <div class="duck-row">🐥🦕🐙🌈🦀</div>
   </header>
 
@@ -393,8 +372,8 @@
 
   <div class="games-grid">
 
-    <!-- Ducky Adventure -->
-    <a class="game-card" href="#" onclick="alert('Copy your Ducky Adventure game code from Claude and save it as ducky-adventure.html to play it here! 🐥'); return false;">
+    <!-- Ducky Adventure - LIVE! -->
+    <a class="game-card" href="ducky-adventure.html">
       <div class="card-banner b-duck">
         <span class="bg-emoji">🦕</span>
         <span class="bg-emoji">🐠</span>

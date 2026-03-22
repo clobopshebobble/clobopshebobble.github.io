@@ -291,6 +291,24 @@
     z-index: 2;
   }
 
+  .new-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: #34D399;
+    color: white;
+    font-family: 'Fredoka One', cursive;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    z-index: 2;
+    animation: badgePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes badgePulse {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.1); }
+  }
+
   footer {
     text-align: center;
     padding: 30px 20px;
@@ -395,9 +413,9 @@
       </div>
     </a>
 
-    <!-- Coming Soon 1 -->
-    <div class="game-card card-soon" style="position:relative;">
-      <div class="soon-badge">Coming Soon!</div>
+    <!-- Dino World - NOW LIVE! -->
+    <a class="game-card" href="dino-world.html" style="position:relative;">
+      <div class="new-badge">✨ New!</div>
       <div class="card-banner b-dino">
         <span class="bg-emoji">🌿</span>
         <span class="bg-emoji">🥚</span>
@@ -407,16 +425,17 @@
       </div>
       <div class="card-body">
         <div class="card-title">Dino World!</div>
-        <div class="card-desc">A brand new dinosaur adventure is hatching... coming very soon!</div>
+        <div class="card-desc">Explore a 3D Jurassic Park! Find 6 dino friends, discover 5 hidden eggs, and roam the jungle! 🌿</div>
         <div class="card-tags">
           <span class="tag tag-dino">🦕 Dinos</span>
-          <span class="tag tag-fun">🌿 Adventure</span>
+          <span class="tag tag-fun">🌿 3D World</span>
+          <span class="tag tag-fun">🥚 Eggs</span>
         </div>
-        <button class="play-btn dino-btn">🥚 Coming Soon...</button>
+        <button class="play-btn dino-btn">▶ Play Now!</button>
       </div>
-    </div>
+    </a>
 
-    <!-- Coming Soon 2 -->
+    <!-- Ocean Explorer - Coming Soon -->
     <div class="game-card card-soon" style="position:relative;">
       <div class="soon-badge">Coming Soon!</div>
       <div class="card-banner b-ocean">
@@ -437,7 +456,7 @@
       </div>
     </div>
 
-    <!-- Coming Soon 3 -->
+    <!-- Rainbow Magic - Coming Soon -->
     <div class="game-card card-soon" style="position:relative;">
       <div class="soon-badge">Coming Soon!</div>
       <div class="card-banner b-magic">

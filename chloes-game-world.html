@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chloe's Game World 🐥</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #87CEEB;
+    --sun: #FFD700;
+    --grass: #5DBB63;
+    --duck: #FFB347;
+    --pink: #FF85B3;
+    --purple: #C084FC;
+    --teal: #34D399;
+    --coral: #FF6B6B;
+    --white: #FFFDF5;
+    --dark: #2D1B69;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--sky);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='28' font-size='28'%3E🐥%3C/text%3E%3C/svg%3E") 4 4, auto;
+  }
+
+  /* Animated sky background */
+  .sky-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0FF 60%, #C8F0C8 100%);
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50px;
+    opacity: 0.85;
+    animation: floatCloud linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+  .cloud::before { width: 60%; height: 180%; top: -50%; left: 15%; }
+  .cloud::after  { width: 45%; height: 150%; top: -35%; right: 15%; }
+
+  @keyframes floatCloud {
+    from { transform: translateX(-200px); }
+    to   { transform: translateX(110vw); }
+  }
+
+  .c1 { width:140px; height:40px; top:8%;  animation-duration:28s; animation-delay:-5s; }
+  .c2 { width:100px; height:30px; top:18%; animation-duration:22s; animation-delay:-14s; }
+  .c3 { width:180px; height:50px; top:5%;  animation-duration:35s; animation-delay:-20s; }
+  .c4 { width:120px; height:36px; top:25%; animation-duration:30s; animation-delay:-8s; }
+
+  /* Floating emoji decorations */
+  .floaty {
+    position: fixed;
+    font-size: 28px;
+    animation: floatBob 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.6;
+  }
+  @keyframes floatBob {
+    0%,100% { transform: translateY(0) rotate(-5deg); }
+    50%      { transform: translateY(-18px) rotate(5deg); }
+  }
+  .f1  { top:12%;  left:3%;   animation-delay:0s;    font-size:32px; }
+  .f2  { top:30%;  right:4%;  animation-delay:0.7s;  font-size:24px; }
+  .f3  { top:55%;  left:2%;   animation-delay:1.4s;  font-size:30px; }
+  .f4  { top:72%;  right:3%;  animation-delay:2.1s;  font-size:26px; }
+  .f5  { top:85%;  left:5%;   animation-delay:0.4s;  font-size:22px; }
+  .f6  { top:45%;  right:2%;  animation-delay:1.8s;  font-size:28px; }
+
+  /* Main content */
+  .content {
+    position: relative;
+    z-index: 2;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 48px 20px 32px;
+    position: relative;
+  }
+
+  .site-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(42px, 8vw, 80px);
+    color: white;
+    text-shadow:
+      4px 4px 0 var(--duck),
+      8px 8px 0 rgba(0,0,0,0.12);
+    line-height: 1.1;
+    letter-spacing: 1px;
+    animation: titleBounce 0.6s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  @keyframes titleBounce {
+    0%   { transform: scale(0.5) rotate(-5deg); opacity:0; }
+    70%  { transform: scale(1.08) rotate(2deg); }
+    100% { transform: scale(1) rotate(0deg); opacity:1; }
+  }
+
+  .site-subtitle {
+    font-size: clamp(16px, 3vw, 22px);
+    color: var(--dark);
+    font-weight: 800;
+    margin-top: 10px;
+    opacity: 0.85;
+    background: rgba(255,255,255,0.6);
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 30px;
+  }
+
+  .duck-row {
+    font-size: 36px;
+    margin-top: 10px;
+    animation: waddle 1.2s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes waddle {
+    0%,100% { transform: rotate(-8deg); }
+    50%      { transform: rotate(8deg); }
+  }
+
+  /* Section label */
+  .section-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: var(--dark);
+    text-align: center;
+    margin: 36px 0 20px;
+    background: rgba(255,255,255,0.7);
+    display: inline-block;
+    padding: 8px 28px;
+    border-radius: 30px;
+    width: 100%;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.08);
+  }
+
+  /* Game grid */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  .game-card {
+    background: white;
+    border-radius: 24px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.12), 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    animation: cardPop 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  .game-card:nth-child(1) { animation-delay: 0.1s; }
+  .game-card:nth-child(2) { animation-delay: 0.2s; }
+  .game-card:nth-child(3) { animation-delay: 0.3s; }
+  .game-card:nth-child(4) { animation-delay: 0.4s; }
+  @keyframes cardPop {
+    from { transform: scale(0.8) translateY(20px); opacity:0; }
+    to   { transform: scale(1) translateY(0); opacity:1; }
+  }
+
+  .game-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 14px 0 rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .game-card:active {
+    transform: translateY(2px) scale(0.99);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+  }
+
+  .card-banner {
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-banner .bg-emoji {
+    position: absolute;
+    opacity: 0.18;
+    font-size: 48px;
+  }
+  .card-banner .bg-emoji:nth-child(1) { top:-5px;  left:-5px;  }
+  .card-banner .bg-emoji:nth-child(2) { bottom:-5px; right:-5px; }
+  .card-banner .bg-emoji:nth-child(3) { top: 50%; left: 5px; transform:translateY(-50%); }
+  .card-banner .bg-emoji:nth-child(4) { top: 50%; right: 5px; transform:translateY(-50%); }
+  .card-banner .main-emoji {
+    font-size: 70px;
+    position: relative;
+    z-index:1;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+    animation: emojiFloat 3s ease-in-out infinite;
+  }
+  @keyframes emojiFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+
+  .b-duck   { background: linear-gradient(135deg, #FFE566 0%, #FFB347 100%); }
+  .b-dino   { background: linear-gradient(135deg, #A8F5A0 0%, #34D399 100%); }
+  .b-ocean  { background: linear-gradient(135deg, #87CEEB 0%, #4A90D9 100%); }
+  .b-magic  { background: linear-gradient(135deg, #F9A8D4 0%, #C084FC 100%); }
+
+  .card-body {
+    padding: 16px 20px 20px;
+  }
+  .card-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+  .tag-duck   { background:#FFF0CC; color:#B07000; }
+  .tag-dino   { background:#DCFCE7; color:#166534; }
+  .tag-ocean  { background:#DBEAFE; color:#1e40af; }
+  .tag-fun    { background:#FCE7F3; color:#9d174d; }
+  .tag-hard   { background:#FEE2E2; color:#991b1b; }
+  .tag-fart   { background:#FEF9C3; color:#854d0e; }
+
+  .play-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: var(--dark);
+    color: white;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .play-btn:hover   { background: #3D2B99; }
+  .play-btn:active  { transform: scale(0.97); }
+
+  .play-btn.duck-btn   { background: #E07800; }
+  .play-btn.duck-btn:hover { background: #C06600; }
+  .play-btn.dino-btn   { background: #059669; }
+  .play-btn.dino-btn:hover { background: #047857; }
+  .play-btn.ocean-btn  { background: #1d6fa8; }
+  .play-btn.ocean-btn:hover { background: #155e87; }
+  .play-btn.magic-btn  { background: #7c3aed; }
+  .play-btn.magic-btn:hover { background: #6d28d9; }
+
+  /* Coming soon card */
+  .card-soon {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .soon-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: white;
+    color: var(--dark);
+    font-family: 'Fredoka One', cursive;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 2;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: var(--dark);
+    opacity: 0.7;
+  }
+
+  /* Grass strip at bottom */
+  .grass-strip {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 36px;
+    background: var(--grass);
+    z-index: 1;
+  }
+  .grass-strip::before {
+    content: '';
+    position: absolute;
+    top: -14px; left: 0; right: 0;
+    height: 18px;
+    background: #7CD67F;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+
+  /* Stars sprinkled around */
+  .star {
+    position: fixed;
+    font-size: 18px;
+    pointer-events: none;
+    animation: twinkle 2.5s ease-in-out infinite;
+    z-index: 1;
+    opacity: 0.7;
+  }
+  @keyframes twinkle {
+    0%,100% { transform: scale(1) rotate(0deg); opacity:0.7; }
+    50%      { transform: scale(1.4) rotate(20deg); opacity:1; }
+  }
+  .s1 { top:6%;  left:15%; animation-delay:0s; }
+  .s2 { top:14%; right:18%; animation-delay:0.6s; }
+  .s3 { top:38%; left:8%;  animation-delay:1.2s; }
+  .s4 { top:60%; right:10%; animation-delay:0.3s; }
+  .s5 { top:80%; left:20%; animation-delay:1.8s; font-size:14px; }
+
+  @media (max-width: 500px) {
+    .games-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sky-bg">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+  <div class="cloud c4"></div>
+</div>
+
+<div class="floaty f1">🦕</div>
+<div class="floaty f2">🐙</div>
+<div class="floaty f3">🌈</div>
+<div class="floaty f4">🦀</div>
+<div class="floaty f5">⭐</div>
+<div class="floaty f6">🐠</div>
+
+<div class="star s1">✨</div>
+<div class="star s2">⭐</div>
+<div class="star s3">✨</div>
+<div class="star s4">⭐</div>
+<div class="star s5">✨</div>
+
+<div class="content">
+  <header>
+    <div class="site-title">🐥 Chloe's Game World!</div>
+    <div class="site-subtitle">Made by Chloe & Claude 🤝</div>
+    <div class="duck-row">🐥🦕🐙🌈🦀</div>
+  </header>
+
+  <div class="section-label">🎮 My Games!</div>
+
+  <div class="games-grid">
+
+    <!-- Ducky Adventure -->
+    <a class="game-card" href="#" onclick="alert('Copy your Ducky Adventure game code from Claude and save it as ducky-adventure.html to play it here! 🐥'); return false;">
+      <div class="card-banner b-duck">
+        <span class="bg-emoji">🦕</span>
+        <span class="bg-emoji">🐠</span>
+        <span class="bg-emoji">⭐</span>
+        <span class="bg-emoji">🌈</span>
+        <span class="main-emoji">🐥</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Ducky Adventure!</div>
+        <div class="card-desc">Explore the world, collect dinos and sea creatures, dodge obstacles, and fart your way to level 50! 💨</div>
+        <div class="card-tags">
+          <span class="tag tag-duck">🐥 Duck</span>
+          <span class="tag tag-dino">🦕 Dinos</span>
+          <span class="tag tag-ocean">🐠 Ocean</span>
+          <span class="tag tag-fart">💨 Farts</span>
+          <span class="tag tag-hard">50 Levels!</span>
+        </div>
+        <button class="play-btn duck-btn">▶ Play Now!</button>
+      </div>
+    </a>
+
+    <!-- Coming Soon 1 -->
+    <div class="game-card card-soon" style="position:relative;">
+      <div class="soon-badge">Coming Soon!</div>
+      <div class="card-banner b-dino">
+        <span class="bg-emoji">🌿</span>
+        <span class="bg-emoji">🥚</span>
+        <span class="bg-emoji">🌋</span>
+        <span class="bg-emoji">🦴</span>
+        <span class="main-emoji">🦖</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Dino World!</div>
+        <div class="card-desc">A brand new dinosaur adventure is hatching... coming very soon!</div>
+        <div class="card-tags">
+          <span class="tag tag-dino">🦕 Dinos</span>
+          <span class="tag tag-fun">🌿 Adventure</span>
+        </div>
+        <button class="play-btn dino-btn">🥚 Coming Soon...</button>
+      </div>
+    </div>
+
+    <!-- Coming Soon 2 -->
+    <div class="game-card card-soon" style="position:relative;">
+      <div class="soon-badge">Coming Soon!</div>
+      <div class="card-banner b-ocean">
+        <span class="bg-emoji">🌊</span>
+        <span class="bg-emoji">🦈</span>
+        <span class="bg-emoji">🐚</span>
+        <span class="bg-emoji">💎</span>
+        <span class="main-emoji">🐬</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Ocean Explorer!</div>
+        <div class="card-desc">Dive deep into the ocean and discover amazing sea creatures and hidden treasure!</div>
+        <div class="card-tags">
+          <span class="tag tag-ocean">🐠 Ocean</span>
+          <span class="tag tag-fun">💎 Treasure</span>
+        </div>
+        <button class="play-btn ocean-btn">🌊 Coming Soon...</button>
+      </div>
+    </div>
+
+    <!-- Coming Soon 3 -->
+    <div class="game-card card-soon" style="position:relative;">
+      <div class="soon-badge">Coming Soon!</div>
+      <div class="card-banner b-magic">
+        <span class="bg-emoji">🌸</span>
+        <span class="bg-emoji">🦋</span>
+        <span class="bg-emoji">🌈</span>
+        <span class="bg-emoji">✨</span>
+        <span class="main-emoji">🦄</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Rainbow Magic!</div>
+        <div class="card-desc">A magical mystery game full of rainbows, butterflies, and sparkles!</div>
+        <div class="card-tags">
+          <span class="tag tag-fun">🌈 Magic</span>
+          <span class="tag tag-fun">🦋 Cute</span>
+        </div>
+        <button class="play-btn magic-btn">✨ Coming Soon...</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>Made with 💛 by Chloe &amp; Claude 🐥</footer>
+<div class="grass-strip"></div>
+
+</body>
+</html>

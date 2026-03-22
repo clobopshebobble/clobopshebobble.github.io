@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dino World — Jurassic Park 🦖</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a1a05;
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
+  width: 100vw; height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#gameWrap {
+  position: relative;
+  width: 100vw; max-width: 800px;
+  height: 100vh; max-height: 530px;
+  overflow: hidden;
+}
+#threeCanvas { display: block; width: 100% !important; height: 100% !important; }
+
+/* HUD */
+#hud {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  pointer-events: none; z-index: 10;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
+}
+.hpill {
+  background: rgba(0,0,0,0.75);
+  border: 1.5px solid rgba(80,200,80,0.45);
+  border-radius: 8px; padding: 5px 13px;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 16px; color: #c8ff80; letter-spacing: 1px;
+}
+#bookBtn { cursor: pointer; pointer-events: all; }
+
+/* Crosshair */
+#xhair {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none; z-index: 10;
+  width: 28px; height: 28px;
+}
+#xhair::before, #xhair::after {
+  content: ''; position: absolute;
+  background: rgba(255,255,255,0.75); border-radius: 2px;
+}
+#xhair::before { width: 2px; height: 18px; top: 5px; left: 13px; }
+#xhair::after  { width: 18px; height: 2px; top: 13px; left: 5px; }
+
+/* Minimap */
+#minimap {
+  position: absolute; bottom: 80px; right: 12px;
+  width: 120px; height: 120px;
+  background: rgba(0,0,0,0.82);
+  border: 2px solid rgba(80,200,80,0.5);
+  border-radius: 10px; z-index: 10; overflow: hidden;
+}
+#minimap canvas { width: 100%; height: 100%; }
+
+/* Interact prompt */
+#prompt {
+  position: absolute; bottom: 112px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 2px solid #ffe033; border-radius: 10px;
+  padding: 8px 20px; color: #ffe033;
+  font-family: 'Bebas Neue', cursive; font-size: 18px; letter-spacing: 2px;
+  z-index: 14; display: none; white-space: nowrap; pointer-events: none;
+}
+
+/* Encounter panel */
+#encounter {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.97) 70%, transparent);
+  padding: 16px 20px 12px; z-index: 15; display: none;
+  display: none; flex-direction: row; gap: 16px; align-items: flex-start;
+}
+#encLeft { flex: 0 0 160px; }
+#encModelBox {
+  width: 160px; height: 160px;
+  border-radius: 12px; overflow: hidden;
+  border: 2px solid rgba(80,200,80,0.4);
+  background: #0a1a05;
+}
+#encModelBox canvas { width: 100% !important; height: 100% !important; display: block; }
+#encRight { flex: 1; }
+#encounter h3 {
+  font-family: 'Bebas Neue', cursive; color: #c8ff80;
+  font-size: 20px; letter-spacing: 2px; margin-bottom: 5px;
+}
+#encounter p { color: #d0f0b0; font-size: 12px; line-height: 1.6; max-width: 440px; }
+#encClose {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(80,200,50,0.2); border: 1.5px solid #5dbb2a;
+  color: #c8ff80; border-radius: 8px; padding: 4px 12px;
+  font-family: 'Bebas Neue', cursive; font-size: 14px;
+  letter-spacing: 1px; cursor: pointer;
+}
+
+/* Toast */
+#toast {
+  position: absolute; top: 56px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.88);
+  border: 2px solid #c8ff80; border-radius: 10px;
+  padding: 7px 20px; color: #c8ff80;
+  font-family: 'Bebas Neue', cursive; font-size: 17px; letter-spacing: 1.5px;
+  z-index: 16; display: none; white-space: nowrap;
+}
+
+/* Loading bar */
+#loadScreen {
+  position: absolute; inset: 0;
+  background: #061203;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 50;
+}
+#loadScreen h2 {
+  font-family: 'Bebas Neue', cursive;
+  color: #c8ff80; font-size: 28px; letter-spacing: 3px; margin-bottom: 20px;
+}
+#loadBar {
+  width: 260px; height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px; overflow: hidden;
+}
+#loadFill {
+  height: 100%; width: 0%;
+  background: #5dbb2a; border-radius: 4px;
+  transition: width 0.3s;
+}
+#loadMsg {
+  font-family: 'Nunito', sans-serif;
+  color: #7ab060; font-size: 13px; margin-top: 12px; letter-spacing: 0.5px;
+}
+
+/* Controls */
+#controls {
+  position: absolute; bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-areas: ". fwd ." "lft . rgt" ". bck .";
+  grid-template-columns: 52px 52px 52px;
+  gap: 5px; z-index: 10;
+}
+.cbtn {
+  background: rgba(0,0,0,0.65);
+  border: 2px solid rgba(80,200,80,0.4);
+  border-radius: 10px; width: 52px; height: 52px;
+  font-size: 22px; cursor: pointer; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  user-select: none; touch-action: none;
+}
+.cbtn:active { background: rgba(80,200,50,0.35); }
+#bFwd  { grid-area: fwd; }
+#bLeft { grid-area: lft; }
+#bRight{ grid-area: rgt; }
+#bBack { grid-area: bck; }
+#bAct {
+  position: absolute; bottom: 12px; right: 10px;
+  width: 60px; height: 60px; z-index: 10;
+  background: rgba(80,200,50,0.25); border: 2px solid #5dbb2a;
+  border-radius: 50%; font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #fff; user-select: none; touch-action: none;
+}
+
+/* Overlay card */
+#overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.78);
+  display: flex; align-items: center; justify-content: center; z-index: 30;
+}
+#card {
+  background: linear-gradient(155deg, #0d2206 0%, #061203 100%);
+  border: 2px solid rgba(80,200,50,0.6);
+  border-radius: 20px; padding: 28px 32px;
+  text-align: center; max-width: 380px; width: 92%;
+  box-shadow: 0 0 60px rgba(0,180,50,0.22);
+}
+#card h2 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 34px; color: #c8ff80; letter-spacing: 3px; margin-bottom: 6px;
+}
+.jpsub { font-family:'Bebas Neue',cursive; font-size:12px; letter-spacing:6px; color:#5dbb2a; margin-bottom:14px; }
+#card p { font-size:13px; color:#b0d890; line-height:1.72; margin-bottom:16px; }
+#card button {
+  background: #3a9010; color: #fff; border: none;
+  border-radius: 10px; padding: 12px 32px;
+  font-family: 'Bebas Neue', cursive; font-size: 21px; letter-spacing: 2px;
+  cursor: pointer; box-shadow: 0 4px 0 #1e5008; transition: transform .1s;
+}
+#card button:active { transform: translateY(3px); box-shadow: 0 1px 0 #1e5008; }
+
+/* Dino book */
+#dinoBook {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.92);
+  display: none; align-items: center; justify-content: center; z-index: 25;
+}
+#bookInner {
+  background: linear-gradient(155deg,#0d2206,#061203);
+  border: 2px solid rgba(80,200,50,0.5);
+  border-radius: 20px; padding: 24px 28px;
+  max-width: 440px; width: 94%; text-align: center;
+}
+#bookInner h2 { font-family:'Bebas Neue',cursive; color:#c8ff80; font-size:24px; letter-spacing:3px; margin-bottom:16px; }
+#dinoGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.dinoCard {
+  background:rgba(0,0,0,0.5); border:1.5px solid rgba(80,200,80,0.2);
+  border-radius:12px; padding:12px 8px; text-align:center;
+}
+.dinoCard.found { border-color:#5dbb2a; background:rgba(20,60,5,0.5); }
+.dinoCard .dIcon { font-size:30px; margin-bottom:3px; }
+.dinoCard .dName { font-family:'Bebas Neue',cursive; color:#5dbb2a; font-size:12px; letter-spacing:1px; }
+.dinoCard .dFact { font-size:10px; color:#7ab060; margin-top:3px; line-height:1.4; display:none; }
+.dinoCard.found .dFact { display:block; }
+#bookInner button {
+  background:#3a9010; color:#fff; border:none;
+  border-radius:10px; padding:9px 24px;
+  font-family:'Bebas Neue',cursive; font-size:16px; letter-spacing:1px; cursor:pointer;
+}
+
+a.back {
+  position: fixed; bottom: 6px; left: 50%; transform: translateX(-50%);
+  font-family:'Bebas Neue',cursive; color:#5dbb2a; font-size:13px;
+  letter-spacing:1px; text-decoration:none; z-index:40;
+}
+a.back:hover { color:#c8ff80; }
+</style>
+</head>
+<body>
+<div id="gameWrap">
+  <canvas id="threeCanvas"></canvas>
+
+  <!-- Loading screen -->
+  <div id="loadScreen">
+    <h2>🦖 LOADING DINO WORLD...</h2>
+    <div id="loadBar"><div id="loadFill"></div></div>
+    <div id="loadMsg">Waking up the dinosaurs...</div>
+  </div>
+
+  <div id="hud">
+    <div class="hpill">🦖 <span id="dinoCount">0</span>/6 Dinos</div>
+    <div class="hpill">🥚 <span id="eggCount">0</span>/5 Eggs</div>
+    <div class="hpill" id="bookBtn" onclick="openBook()">📋 Field Guide</div>
+  </div>
+
+  <div id="xhair"></div>
+  <div id="minimap"><canvas id="mm"></canvas></div>
+  <div id="prompt">[ E ] INTERACT</div>
+
+  <div id="encounter">
+    <button id="encClose" onclick="closeEncounter()">CLOSE ✕</button>
+    <div id="encLeft">
+      <div id="encModelBox"></div>
+    </div>
+    <div id="encRight">
+      <h3 id="encTitle"></h3>
+      <p id="encMsg"></p>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <div id="controls">
+    <button class="cbtn" id="bFwd">▲</button>
+    <button class="cbtn" id="bLeft">◀</button>
+    <button class="cbtn" id="bRight">▶</button>
+    <button class="cbtn" id="bBack">▼</button>
+  </div>
+  <button id="bAct">🤝</button>
+
+  <div id="overlay" style="display:none;">
+    <div id="card">
+      <div class="jpsub">⚡ JURASSIC PARK ⚡</div>
+      <h2 id="cardTitle">DINO WORLD</h2>
+      <p id="cardMsg">
+        Welcome to <b style="color:#c8ff80">Dino World!</b><br>
+        Walk through a real 3D Jurassic Park!<br><br>
+        🦖 Find <b>6 dino friends</b> in the park<br>
+        🥚 Discover <b>5 hidden eggs</b><br>
+        🌿 Explore the jungle and paddocks<br><br>
+        <b>← → Arrow keys</b> to turn<br>
+        <b>↑ ↓ Arrow keys</b> to walk<br>
+        <b>E or tap 🤝</b> to interact!
+      </p>
+      <button id="cardBtn">ENTER THE PARK</button>
+    </div>
+  </div>
+
+  <div id="dinoBook">
+    <div id="bookInner">
+      <h2>🦖 MY DINO FRIENDS!</h2>
+      <div id="dinoGrid"></div>
+      <button onclick="closeBook()">BACK TO EXPLORING</button>
+    </div>
+  </div>
+</div>
+
+<a class="back" href="index.html">← Back to Chloe's Game World</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── GLTFLoader (inline, compatible with r128) ─────────────────
+// We load it from CDN
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+//  RENDERER + SCENE + CAMERA
+// ═══════════════════════════════════════════════════════
+var gw       = document.getElementById('gameWrap');
+var canvas3d = document.getElementById('threeCanvas');
+
+var renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true });
+renderer.setSize(gw.clientWidth, gw.clientHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.outputEncoding    = THREE.sRGBEncoding;
+
+var scene  = new THREE.Scene();
+scene.fog  = new THREE.FogExp2(0x2a4a15, 0.038);
+
+var camera = new THREE.PerspectiveCamera(70, gw.clientWidth / gw.clientHeight, 0.1, 200);
+
+// ── Lighting ──────────────────────────────────────────
+var ambLight = new THREE.AmbientLight(0x506a30, 1.0);
+scene.add(ambLight);
+
+var sun = new THREE.DirectionalLight(0xffe8c0, 2.5);
+sun.position.set(40, 60, 30);
+sun.castShadow = true;
+sun.shadow.mapSize.width  = 2048;
+sun.shadow.mapSize.height = 2048;
+sun.shadow.camera.near   = 1;   sun.shadow.camera.far    = 200;
+sun.shadow.camera.left   = -80; sun.shadow.camera.right  =  80;
+sun.shadow.camera.top    =  80; sun.shadow.camera.bottom = -80;
+scene.add(sun);
+
+var fillLight = new THREE.DirectionalLight(0x80b0ff, 0.4);
+fillLight.position.set(-20, 15, -10);
+scene.add(fillLight);
+
+// ── Sky ───────────────────────────────────────────────
+(function() {
+  var geo    = new THREE.SphereGeometry(180, 12, 8);
+  var colArr = [];
+  var pos    = geo.attributes.position;
+  var topC   = new THREE.Color(0x1a5090);
+  var botC   = new THREE.Color(0x70b060);
+  for (var i = 0; i < pos.count; i++) {
+    var t = Math.max(0, Math.min(1, (pos.getY(i) + 100) / 200));
+    var c = topC.clone().lerp(botC, 1 - t);
+    colArr.push(c.r, c.g, c.b);
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3));
+  scene.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ side: THREE.BackSide, vertexColors: true })));
+})();
+
+// ═══════════════════════════════════════════════════════
+//  TEXTURES
+// ═══════════════════════════════════════════════════════
+function makeTex(w, h, drawFn) {
+  var c = document.createElement('canvas'); c.width = w; c.height = h;
+  drawFn(c.getContext('2d'), w, h);
+  var t = new THREE.CanvasTexture(c);
+  t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+
+var groundTex = makeTex(512, 512, function(ctx, w, h) {
+  ctx.fillStyle = '#3a6a1a'; ctx.fillRect(0,0,w,h);
+  for (var i=0;i<5000;i++){
+    var x=Math.random()*w, y=Math.random()*h;
+    var rv=20+Math.floor(Math.random()*40), gv=50+Math.floor(Math.random()*70), bv=Math.floor(Math.random()*15);
+    ctx.fillStyle='rgb('+rv+','+gv+','+bv+')';
+    ctx.fillRect(x,y,2+Math.random()*3,2+Math.random()*3);
+  }
+});
+groundTex.repeat.set(24,24);
+
+var jungleTex = makeTex(256,256,function(ctx,w,h){
+  ctx.fillStyle='#224a10'; ctx.fillRect(0,0,w,h);
+  for(var i=0;i<60;i++){
+    ctx.strokeStyle='rgba('+(10+Math.floor(Math.random()*20))+','+(40+Math.floor(Math.random()*40))+',5,0.6)';
+    ctx.lineWidth=1+Math.random()*3;
+    ctx.beginPath(); ctx.moveTo(Math.random()*w,0); ctx.lineTo(Math.random()*w,h); ctx.stroke();
+  }
+  for(var j=0;j<100;j++){
+    ctx.fillStyle='rgba('+(20+Math.floor(Math.random()*50))+','+(80+Math.floor(Math.random()*90))+',10,0.65)';
+    ctx.beginPath(); ctx.ellipse(Math.random()*w,Math.random()*h,5+Math.random()*12,2+Math.random()*6,Math.random()*Math.PI,0,Math.PI*2); ctx.fill();
+  }
+});
+jungleTex.repeat.set(3,3);
+
+var stoneTex = makeTex(256,256,function(ctx,w,h){
+  ctx.fillStyle='#5a5548'; ctx.fillRect(0,0,w,h);
+  for(var row=0;row<9;row++) for(var col=0;col<7;col++){
+    ctx.fillStyle='rgb('+(75+Math.floor(Math.random()*35))+','+(70+Math.floor(Math.random()*30))+','+(55+Math.floor(Math.random()*25))+')';
+    ctx.fillRect(col*38+(row%2)*18+2,row*28+2,34,24);
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  MAP
+// ═══════════════════════════════════════════════════════
+var COLS=28, ROWS=28, TILE=5;
+var MAP=[
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,1],
+  [1,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0,1],
+  [1,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0,1],
+  [1,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,1,0,0,0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,0,1,0,0,1],
+  [1,0,0,1,0,0,0,0,0,0,0,0,3,3,3,3,3,0,0,0,0,0,0,0,1,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1],
+  [1,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,1],
+  [1,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0,1],
+  [1,0,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0,1],
+  [1,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+];
+
+// ═══════════════════════════════════════════════════════
+//  BUILD WORLD
+// ═══════════════════════════════════════════════════════
+function makeMat(col) { return new THREE.MeshLambertMaterial({ color: col }); }
+
+// Ground
+var gnd = new THREE.Mesh(new THREE.PlaneGeometry(COLS*TILE,ROWS*TILE), new THREE.MeshLambertMaterial({map:groundTex}));
+gnd.rotation.x=-Math.PI/2; gnd.position.set(COLS*TILE/2,0,ROWS*TILE/2); gnd.receiveShadow=true; scene.add(gnd);
+
+function addWall(col,row,type){
+  var wh=(type===3)?0.4:(type===1)?5+Math.random()*3:4.5;
+  var wmat=(type===1)?new THREE.MeshLambertMaterial({map:jungleTex})
+          :(type===2)?new THREE.MeshLambertMaterial({map:stoneTex})
+          :new THREE.MeshLambertMaterial({color:0x1a4870,transparent:true,opacity:0.82});
+  var wm=new THREE.Mesh(new THREE.BoxGeometry(TILE,wh,TILE),wmat);
+  wm.position.set(col*TILE+TILE/2,wh/2,row*TILE+TILE/2);
+  wm.castShadow=true; wm.receiveShadow=true; scene.add(wm);
+  if(type===1){
+    for(var k=0;k<4;k++){
+      var lc=new THREE.Color(); lc.setHSL(0.28+Math.random()*0.06,0.7,0.18+Math.random()*0.14);
+      var lm=new THREE.Mesh(new THREE.SphereGeometry(1.6+Math.random()*1.4,7,5),new THREE.MeshLambertMaterial({color:lc}));
+      lm.position.set(col*TILE+TILE/2+(Math.random()-.5)*TILE*.7,wh+.5+Math.random()*2,row*TILE+TILE/2+(Math.random()-.5)*TILE*.7);
+      lm.castShadow=true; scene.add(lm);
+    }
+  }
+  if(type===3){
+    var ws=new THREE.Mesh(new THREE.PlaneGeometry(TILE,TILE),new THREE.MeshLambertMaterial({color:0x3090d0,transparent:true,opacity:0.6}));
+    ws.rotation.x=-Math.PI/2; ws.position.set(col*TILE+TILE/2,.42,row*TILE+TILE/2); scene.add(ws);
+  }
+}
+for(var wr=0;wr<ROWS;wr++) for(var wc=0;wc<COLS;wc++) if(MAP[wr][wc]>0) addWall(wc,wr,MAP[wr][wc]);
+
+// Trees
+function addTree(wx,wz){
+  var th=5+Math.random()*5;
+  var tr=new THREE.Mesh(new THREE.CylinderGeometry(.2,.32,th,7),makeMat(0x4a2e18));
+  tr.position.set(wx,th/2,wz); tr.castShadow=true; scene.add(tr);
+  for(var ci=0;ci<4;ci++){
+    var cc=new THREE.Color(); cc.setHSL(.27+Math.random()*.06,.65,.18+Math.random()*.12);
+    var cm=new THREE.Mesh(new THREE.SphereGeometry(1.2-ci*.18+Math.random()*.5,7,5),new THREE.MeshLambertMaterial({color:cc}));
+    cm.position.set(wx+(Math.random()-.5)*.7,th+ci*.7+Math.random()*.5,wz+(Math.random()-.5)*.7);
+    cm.castShadow=true; scene.add(cm);
+  }
+}
+for(var tr2=1;tr2<ROWS-1;tr2++) for(var tc=1;tc<COLS-1;tc++)
+  if(MAP[tr2][tc]===0&&Math.random()<.055) addTree(tc*TILE+TILE/2+(Math.random()-.5)*2,tr2*TILE+TILE/2+(Math.random()-.5)*2);
+
+// Ground ferns
+for(var fi=0;fi<400;fi++){
+  var fc=Math.floor(Math.random()*(COLS-2))+1, fr=Math.floor(Math.random()*(ROWS-2))+1;
+  if(MAP[fr][fc]!==0) continue;
+  var fnc=new THREE.Color(); fnc.setHSL(.3+Math.random()*.05,.7,.2+Math.random()*.14);
+  var fm=new THREE.Mesh(new THREE.SphereGeometry(.28+Math.random()*.3,5,3),new THREE.MeshLambertMaterial({color:fnc}));
+  fm.scale.set(1,.35+Math.random()*.4,1);
+  fm.position.set(fc*TILE+(Math.random()-.5)*TILE*.8,.22,fr*TILE+(Math.random()-.5)*TILE*.8);
+  scene.add(fm);
+}
+
+// Electric fences
+function addFence(x1,z1,x2,z2){
+  var pm=makeMat(0x707060), wm2=new THREE.MeshBasicMaterial({color:0xd0d020});
+  var corners=[[x1,z1],[x2,z1],[x2,z2],[x1,z2]];
+  for(var ci2=0;ci2<corners.length;ci2++){
+    var p2=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,2.8,5),pm);
+    p2.position.set(corners[ci2][0],1.4,corners[ci2][1]); scene.add(p2);
+  }
+  var sides=[[x1,z1,x2,z1],[x2,z1,x2,z2],[x2,z2,x1,z2],[x1,z2,x1,z1]];
+  for(var si=0;si<sides.length;si++){
+    var s=sides[si], sx1=s[0],sz1=s[1],sx2=s[2],sz2=s[3];
+    var mp2=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,2.8,5),pm);
+    mp2.position.set((sx1+sx2)/2,1.4,(sz1+sz2)/2); scene.add(mp2);
+    for(var whi=0;whi<3;whi++){
+      var wy=[.7,1.4,2.2][whi];
+      var wlen=Math.sqrt(Math.pow(sx2-sx1,2)+Math.pow(sz2-sz1,2));
+      var wire=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,wlen,4),wm2);
+      wire.position.set((sx1+sx2)/2,wy,(sz1+sz2)/2);
+      if(Math.abs(sz2-sz1)>Math.abs(sx2-sx1)) wire.rotation.x=Math.PI/2; else wire.rotation.z=Math.PI/2;
+      scene.add(wire);
+    }
+  }
+}
+addFence(3*TILE,3*TILE,6*TILE,6*TILE); addFence(22*TILE,3*TILE,25*TILE,6*TILE);
+addFence(3*TILE,19*TILE,6*TILE,22*TILE); addFence(22*TILE,19*TILE,25*TILE,22*TILE);
+
+// Entrance arch
+(function(){
+  var am=makeMat(0x5a4a2a);
+  var lp=new THREE.Mesh(new THREE.BoxGeometry(.8,6,.8),am); lp.position.set(12*TILE,3,1.2*TILE); lp.castShadow=true; scene.add(lp);
+  var rp=new THREE.Mesh(new THREE.BoxGeometry(.8,6,.8),am); rp.position.set(15.5*TILE,3,1.2*TILE); rp.castShadow=true; scene.add(rp);
+  var bm=new THREE.Mesh(new THREE.BoxGeometry(3.5*TILE,.7,.8),am); bm.position.set(13.75*TILE,6.3,1.2*TILE); bm.castShadow=true; scene.add(bm);
+  var tpos=[12*TILE+.5,15.5*TILE-.5];
+  for(var ti=0;ti<2;ti++){
+    var tx=tpos[ti];
+    var tm=new THREE.Mesh(new THREE.CylinderGeometry(.12,.08,.5,6),makeMat(0x806040));
+    tm.position.set(tx,6.65,1.2*TILE); scene.add(tm);
+    var fl=new THREE.PointLight(0xff8820,1.5,5); fl.position.set(tx,7.2,1.2*TILE); scene.add(fl);
+  }
+})();
+
+// ═══════════════════════════════════════════════════════
+//  DINO DEFINITIONS  — two real GLB models, rest use shapes
+// ═══════════════════════════════════════════════════════
+var DINO_DEFS = [
+  { id:'trex',    name:'Chompy',      era:'The Biggest Biter 🦷', icon:'🦖',
+    fact:'Chompy has the BIGGEST bite of any land animal ever! His arms are tiny but he thinks they are very cool and stylish.',
+    wx:4.5*TILE, wz:4.5*TILE,
+    modelFile:'https://clobopshebobble.github.io/cute_dino.glb', modelScale:1.5, modelY:0,
+    found:false },
+  { id:'trice',   name:'Trixie',      era:'The Three-Horned Cutie 🌸', icon:'🦕',
+    fact:'Trixie has THREE horns and a big beautiful frill that turns pink when she is happy! She loves flowers and head-booping her friends.',
+    wx:23.5*TILE, wz:4.5*TILE,
+    modelFile:'https://clobopshebobble.github.io/cute_red_childrens_dino.glb', modelScale:1.5, modelY:0,
+    found:false },
+  { id:'brachio', name:'Noodleneck',  era:'The Tallest Noodle 🍜', icon:'🦕',
+    fact:'Noodleneck has the longest neck in the WHOLE park and can eat leaves from the very tippy top of trees! She loves tickling birds with her nose.',
+    wx:14*TILE, wz:11.5*TILE,
+    sketchfabId:'32900e4ffee0490ea692ace2ca8c7c0f',
+    bodyColor:0x5a7840, darkColor:0x3a5828,
+    bodyScale:[2.0,1.5,3.5], legH:2.5, legW:0.50, neckLen:4.5,
+    headW:0.65, headH:0.52, tailLen:2.2, biped:false, isLongNeck:true,
+    found:false },
+  { id:'raptor',  name:'Claw',        era:'The Sneaky Speedster 💨', icon:'🦖',
+    fact:'Claw is super fast and extra clever! She and her friends make up secret plans together. She is also secretly very cuddly but do NOT tell anyone.',
+    wx:4.5*TILE, wz:22.5*TILE,
+    bodyColor:0x7a6858, darkColor:0x5a4838,
+    bodyScale:[0.7,0.65,1.4], legH:1.1, legW:0.22, neckLen:0.7,
+    headW:0.52, headH:0.44, tailLen:1.9, biped:true,
+    found:false },
+  { id:'stego',   name:'Spiky',       era:'The Spikiest Buddy 💖', icon:'🦎',
+    fact:'Spiky has amazing pink plates on his back that light up when he is excited! His brain is the size of a walnut but his heart is HUGE.',
+    wx:23.5*TILE, wz:22.5*TILE,
+    bodyColor:0x687848, darkColor:0x485828,
+    bodyScale:[1.6,1.1,2.8], legH:1.4, legW:0.40, neckLen:0.55,
+    headW:0.62, headH:0.52, tailLen:2.2, biped:false, hasPlates:true,
+    found:false },
+  { id:'ptero',   name:'Flappy',      era:'The Sky Queen', icon:'🦅',
+    fact:'Flappy has wings bigger than a whole car! She loves soaring over the park doing loop-de-loops. She is the best at spotting hidden eggs from up high.',
+    wx:14*TILE, wz:3*TILE,
+    bodyColor:0x8a7060, darkColor:0x6a5040,
+    isPtero:true, found:false }
+];
+
+// ═══════════════════════════════════════════════════════
+//  BUILD SHAPE-BASED DINOS (fallback / non-GLB dinos)
+// ═══════════════════════════════════════════════════════
+var dinoGroups = [];
+
+function buildShapeDino(def) {
+  var g = new THREE.Group();
+  var bx=def.bodyScale[0], by=def.bodyScale[1], bz=def.bodyScale[2];
+
+  var body=new THREE.Mesh(new THREE.SphereGeometry(1,9,7),makeMat(def.bodyColor));
+  body.scale.set(bx,by,bz); body.position.y=def.legH; g.add(body);
+
+  if(def.biped){
+    var bl=[[-1,1],[1,1]];
+    for(var li=0;li<2;li++){
+      var lx=bl[li][0],lz2=bl[li][1];
+      var leg=new THREE.Mesh(new THREE.CylinderGeometry(def.legW,def.legW*.72,def.legH,7),makeMat(def.darkColor));
+      leg.position.set(lx*bx*.55,def.legH*.5,lz2*bz*.42); g.add(leg);
+      var foot=new THREE.Mesh(new THREE.SphereGeometry(def.legW*.9,6,4),makeMat(def.darkColor));
+      foot.scale.set(1,.42,1.55); foot.position.set(lx*bx*.55,.2,lz2*bz*.42+.22); g.add(foot);
+      var arm=new THREE.Mesh(new THREE.CylinderGeometry(.11,.08,.5,5),makeMat(def.darkColor));
+      arm.rotation.z=lx*1.05; arm.rotation.x=.5;
+      arm.position.set(lx*bx*.92,def.legH+by*.4,-bz*.22); g.add(arm);
+    }
+  } else {
+    var ql=[[-bx*.52,1],[bx*.52,1],[-bx*.52,-1],[bx*.52,-1]];
+    for(var qi=0;qi<4;qi++){
+      var qlx=ql[qi][0],qlz=ql[qi][1];
+      var qleg=new THREE.Mesh(new THREE.CylinderGeometry(def.legW*.7,def.legW*.55,def.legH,7),makeMat(def.darkColor));
+      qleg.position.set(qlx,def.legH*.5,qlz*bz*.5); g.add(qleg);
+      var qfoot=new THREE.Mesh(new THREE.SphereGeometry(def.legW*.75,6,4),makeMat(def.darkColor));
+      qfoot.scale.set(1,.38,1.35); qfoot.position.set(qlx,.18,qlz*bz*.5); g.add(qfoot);
+    }
+  }
+
+  var neckY=def.legH+by*.7+def.neckLen*.42, neckZ=-bz*.6;
+  if(def.isLongNeck){neckY=def.legH+by*.7;neckZ=-bz*.55;}
+  var neck=new THREE.Mesh(new THREE.CylinderGeometry(def.headW*.5,bx*.42,def.neckLen,7),makeMat(def.bodyColor));
+  if(def.isLongNeck) neck.rotation.x=-1.15;
+  neck.position.set(0,neckY,neckZ); g.add(neck);
+
+  var hY=neckY+(def.isLongNeck?def.neckLen*.58:def.neckLen*.72);
+  var hZ=neckZ+(def.isLongNeck?-def.neckLen*.28:-def.neckLen*.38);
+  var head=new THREE.Mesh(new THREE.SphereGeometry(1,8,6),makeMat(def.bodyColor));
+  head.scale.set(def.headW,def.headH,def.headW*1.38); head.position.set(0,hY,hZ); g.add(head);
+  var snout=new THREE.Mesh(new THREE.SphereGeometry(1,7,5),makeMat(def.darkColor));
+  snout.scale.set(def.headW*.68,def.headH*.62,def.headW*.88); snout.position.set(0,hY-def.headH*.12,hZ-def.headW*1.05); g.add(snout);
+
+  for(var ei=0;ei<2;ei++){
+    var es=[-1,1][ei];
+    var eye=new THREE.Mesh(new THREE.SphereGeometry(.09,6,4),new THREE.MeshBasicMaterial({color:0xffee00}));
+    eye.position.set(es*def.headW*.72,hY+def.headH*.18,hZ-def.headW*.48); g.add(eye);
+    var pupil=new THREE.Mesh(new THREE.SphereGeometry(.055,5,4),new THREE.MeshBasicMaterial({color:0x080808}));
+    pupil.position.set(es*def.headW*.78,hY+def.headH*.18,hZ-def.headW*.7); g.add(pupil);
+  }
+
+  var tail=new THREE.Mesh(new THREE.CylinderGeometry(bx*.18,.06,def.tailLen,7),makeMat(def.bodyColor));
+  tail.rotation.x=.38; tail.position.set(0,def.legH+by*.32,bz*.75+def.tailLen*.38); g.add(tail);
+
+  for(var di2=0;di2<6;di2++){
+    var rdg=new THREE.Mesh(new THREE.SphereGeometry(.1,5,4),makeMat(def.darkColor));
+    rdg.scale.set(.6,1.5,.5); rdg.position.set(0,def.legH+by*1.02-di2*.04,-bz*.5+di2*(bz*.23)); g.add(rdg);
+  }
+
+  if(def.hasPlates){
+    for(var pi=0;pi<9;pi++){
+      var pl=new THREE.Mesh(new THREE.ConeGeometry(.24-pi*.018,.78-pi*.04,4),makeMat(0xc05870));
+      pl.position.set(0,def.legH+by*1.08,-bz*.52+pi*(bz*.22)); g.add(pl);
+    }
+    var spks=[-0.28,0.28];
+    for(var ski=0;ski<2;ski++){
+      var spk=new THREE.Mesh(new THREE.ConeGeometry(.09,.65,5),makeMat(0xd0c090));
+      spk.rotation.z=spks[ski]>0?.65:-.65; spk.rotation.x=.3;
+      spk.position.set(spks[ski],def.legH+.12,bz*.85+.55); g.add(spk);
+    }
+  }
+
+  if(def.isPtero){
+    var pb=new THREE.Mesh(new THREE.SphereGeometry(.65,8,6),makeMat(def.bodyColor));
+    pb.scale.set(1,.58,1.9); g.add(pb);
+    var ph=new THREE.Mesh(new THREE.SphereGeometry(.38,8,6),makeMat(def.bodyColor));
+    ph.position.set(0,.22,-1.1); g.add(ph);
+    var pbk=new THREE.Mesh(new THREE.CylinderGeometry(.055,.02,1,5),makeMat(def.darkColor));
+    pbk.rotation.x=Math.PI/2; pbk.position.set(0,.2,-1.82); g.add(pbk);
+    function makeWing(side){
+      var wg=new THREE.BufferGeometry();
+      var verts=new Float32Array([0,0,0,side*4.2,.3,-.2,side*3.8,0,-1.8,0,0,0,side*3.8,0,-1.8,side*.4,0,-1.4]);
+      wg.setAttribute('position',new THREE.BufferAttribute(verts,3)); wg.computeVertexNormals();
+      g.add(new THREE.Mesh(wg,new THREE.MeshLambertMaterial({color:def.bodyColor,side:THREE.DoubleSide})));
+    }
+    makeWing(1); makeWing(-1);
+    g.position.set(def.wx,16,def.wz);
+    g.userData={def:def,flyA:Math.random()*Math.PI*2,baseY:14,walkA:0,idleA:0};
+  } else {
+    g.position.set(def.wx,0,def.wz);
+    g.userData={def:def,flyA:0,baseY:0,walkA:Math.random()*Math.PI*2,idleA:Math.random()*Math.PI*2};
+  }
+
+  g.traverse(function(m){if(m.isMesh){m.castShadow=true;m.receiveShadow=true;}});
+  scene.add(g);
+  return g;
+}
+
+// ═══════════════════════════════════════════════════════
+//  LOAD GLB MODELS
+// ═══════════════════════════════════════════════════════
+var loader = new THREE.GLTFLoader();
+var modelsLoaded = 0;
+var modelsTotal  = 0;
+
+function setLoadMsg(msg) { document.getElementById('loadMsg').textContent = msg; }
+function setLoadPct(pct)  { document.getElementById('loadFill').style.width = pct + '%'; }
+
+function loadGLBDino(def, index) {
+  modelsTotal++;
+  loader.load(
+    def.modelFile,
+    function(gltf) {
+      var g = gltf.scene;
+
+      // Auto-scale to a reasonable size
+      var box = new THREE.Box3().setFromObject(g);
+      var size = new THREE.Vector3();
+      box.getSize(size);
+      var maxDim = Math.max(size.x, size.y, size.z);
+      var targetSize = def.modelScale || 2.5;
+      var s = targetSize / maxDim;
+      g.scale.set(s, s, s);
+
+      // Sit on ground
+      box.setFromObject(g);
+      g.position.set(def.wx, -box.min.y * s, def.wz);
+
+      g.traverse(function(m) {
+        if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; }
+      });
+
+      g.userData = { def: def, walkA: Math.random()*Math.PI*2, idleA: Math.random()*Math.PI*2, flyA: 0, baseY: 0 };
+      scene.add(g);
+      dinoGroups[index] = g;
+
+      modelsLoaded++;
+      setLoadPct(30 + (modelsLoaded / modelsTotal) * 50);
+      setLoadMsg('Loaded ' + def.name + '! 🦖');
+      checkAllLoaded();
+    },
+    function(xhr) {
+      // progress
+    },
+    function(err) {
+      console.warn('GLB load failed for ' + def.modelFile + ', using shape fallback');
+      dinoGroups[index] = buildShapeDino(def);
+      modelsLoaded++;
+      setLoadPct(30 + (modelsLoaded / modelsTotal) * 50);
+      checkAllLoaded();
+    }
+  );
+}
+
+function checkAllLoaded() {
+  if (modelsLoaded >= modelsTotal) {
+    setLoadPct(100);
+    setLoadMsg('Welcome to Dino World! 🌿');
+    setTimeout(function() {
+      document.getElementById('loadScreen').style.display = 'none';
+      document.getElementById('overlay').style.display    = 'flex';
+    }, 600);
+  }
+}
+
+// Init all dinos
+setLoadPct(10);
+setLoadMsg('Building the jungle...');
+for (var di = 0; di < DINO_DEFS.length; di++) {
+  dinoGroups.push(null); // reserve slot
+}
+
+setTimeout(function() {
+  setLoadPct(30); setLoadMsg('Waking up the dinosaurs...');
+  for (var dj = 0; dj < DINO_DEFS.length; dj++) {
+    var def = DINO_DEFS[dj];
+    if (def.modelFile) {
+      loadGLBDino(def, dj);
+    } else {
+      dinoGroups[dj] = buildShapeDino(def);
+      // non-GLB dinos count as instant
+    }
+  }
+  // If no GLB models to load (shouldn't happen), show overlay
+  if (modelsTotal === 0) checkAllLoaded();
+}, 200);
+
+// ═══════════════════════════════════════════════════════
+//  EGGS
+// ═══════════════════════════════════════════════════════
+var EGG_DEFS=[
+  {wx:6.5*TILE,wz:6.2*TILE,  color:0xd0c0a0,found:false},
+  {wx:22.5*TILE,wz:6.2*TILE, color:0xa8c8d8,found:false},
+  {wx:13*TILE,wz:11.5*TILE,  color:0xd0a8c0,found:false},
+  {wx:6.5*TILE,wz:22.5*TILE, color:0xb8d8a0,found:false},
+  {wx:22.5*TILE,wz:22.5*TILE,color:0xffe0a0,found:false}
+];
+var eggObjs=[];
+for(var egi=0;egi<EGG_DEFS.length;egi++){
+  var ed=EGG_DEFS[egi];
+  var eg=new THREE.Group();
+  var eb=new THREE.Mesh(new THREE.SphereGeometry(.52,9,7),makeMat(ed.color));
+  eb.scale.set(1,1.3,1); eg.add(eb);
+  for(var sp=0;sp<10;sp++){
+    var espot=new THREE.Mesh(new THREE.SphereGeometry(.065,5,4),makeMat(0x786858));
+    var phi=Math.random()*Math.PI,theta=Math.random()*Math.PI*2;
+    espot.position.set(Math.sin(phi)*Math.cos(theta)*.5,Math.cos(phi)*.64,Math.sin(phi)*Math.sin(theta)*.5);
+    eg.add(espot);
+  }
+  var ering=new THREE.Mesh(new THREE.TorusGeometry(.72,.04,6,18),new THREE.MeshBasicMaterial({color:0xffdd00,transparent:true,opacity:.65}));
+  ering.rotation.x=Math.PI/2; ering.position.y=-.1; eg.add(ering);
+  eg.position.set(ed.wx,.62,ed.wz); eg.castShadow=true;
+  eg.userData={eggDef:ed,ring:ering,phase:Math.random()*Math.PI*2};
+  scene.add(eg); eggObjs.push(eg);
+}
+
+// ═══════════════════════════════════════════════════════
+//  ENCOUNTER MODEL VIEWER (mini Three.js scene for popup)
+// ═══════════════════════════════════════════════════════
+var encRenderer = null, encScene = null, encCamera = null, encModel = null, encAnimating = false;
+
+function initEncRenderer() {
+  if (encRenderer) return;
+  var box = document.getElementById('encModelBox');
+  box.innerHTML = '';
+  var ec = document.createElement('canvas');
+  box.appendChild(ec);
+  encRenderer = new THREE.WebGLRenderer({ canvas: ec, antialias: true, alpha: true });
+  encRenderer.setSize(160, 160);
+  encRenderer.outputEncoding = THREE.sRGBEncoding;
+  encRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+  encRenderer.toneMappingExposure = 1.2;
+
+  encScene  = new THREE.Scene();
+  encCamera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
+  encCamera.position.set(0, 1.5, 4);
+  encCamera.lookAt(0, 0.5, 0);
+
+  encScene.add(new THREE.AmbientLight(0xffffff, 1.2));
+  var eL = new THREE.DirectionalLight(0xffe8c0, 2.0);
+  eL.position.set(3, 5, 3); encScene.add(eL);
+  var eL2 = new THREE.DirectionalLight(0x80b0ff, 0.5);
+  eL2.position.set(-3, 2, -2); encScene.add(eL2);
+}
+
+function showEncModelOf(def) {
+  var box = document.getElementById('encModelBox');
+  box.innerHTML = '';
+  encAnimating = false;
+
+  if (def.sketchfabId) {
+    // Show Sketchfab iframe!
+    var iframe = document.createElement('iframe');
+    iframe.title = def.name;
+    iframe.frameBorder = '0';
+    iframe.allowFullscreen = true;
+    iframe.allow = 'autoplay; fullscreen; xr-spatial-tracking';
+    iframe.src = 'https://sketchfab.com/models/' + def.sketchfabId + '/embed?autostart=1&ui_hint=0&ui_controls=0&ui_infos=0';
+    iframe.style.width = '160px';
+    iframe.style.height = '160px';
+    iframe.style.borderRadius = '10px';
+    box.appendChild(iframe);
+    return;
+  }
+
+  // Otherwise use Three.js mini renderer
+  initEncRenderer();
+  if (encModel) { encScene.remove(encModel); encModel = null; }
+
+  if (def.modelFile) {
+    loader.load(def.modelFile, function(gltf) {
+      encModel = gltf.scene;
+      var b = new THREE.Box3().setFromObject(encModel);
+      var s2 = new THREE.Vector3(); b.getSize(s2);
+      var maxD = Math.max(s2.x, s2.y, s2.z);
+      var sc = 2.5 / maxD;
+      encModel.scale.set(sc, sc, sc);
+      b.setFromObject(encModel);
+      var ctr = new THREE.Vector3(); b.getCenter(ctr);
+      encModel.position.set(-ctr.x, -b.min.y * sc, -ctr.z);
+      encScene.add(encModel);
+      encCamera.position.set(0, s2.y * sc * 0.7, maxD * sc * 1.4);
+      encCamera.lookAt(0, s2.y * sc * 0.4, 0);
+      encAnimating = true;
+    });
+  } else {
+    var shapeCopy = buildShapeDino(def);
+    shapeCopy.position.set(0, 0, 0);
+    var b2 = new THREE.Box3().setFromObject(shapeCopy);
+    var ctr2 = new THREE.Vector3(); b2.getCenter(ctr2);
+    shapeCopy.position.set(-ctr2.x, -b2.min.y, -ctr2.z);
+    encModel = shapeCopy;
+    encScene.add(encModel);
+    var sz2 = new THREE.Vector3(); b2.getSize(sz2);
+    encCamera.position.set(0, sz2.y * 0.7, Math.max(sz2.x, sz2.z) * 1.6);
+    encCamera.lookAt(0, sz2.y * 0.4, 0);
+    encAnimating = true;
+  }
+}
+
+function stopEncModel() {
+  encAnimating = false;
+  if (encModel && encScene) { encScene.remove(encModel); encModel = null; }
+  var box = document.getElementById('encModelBox');
+  if (box) box.innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════════
+//  PLAYER
+// ═══════════════════════════════════════════════════════
+var playerPos   = new THREE.Vector3(13.5*TILE, 1.75, 1.8*TILE);
+var playerAngle = Math.PI;
+var MOVE_SPEED  = 0.13;
+var TURN_SPEED  = 0.048;
+var keys        = {};
+var gameRunning = false;
+var dinoCount   = 0, eggCount = 0;
+var encounterOpen = false;
+var toastTimer  = 0;
+var nearbyDino  = null, nearbyEgg = null;
+var clock       = new THREE.Clock();
+
+function isBlocked(x, z) {
+  var col=Math.floor(x/TILE), row=Math.floor(z/TILE);
+  if(col<0||row<0||col>=COLS||row>=ROWS) return true;
+  return MAP[row][col]!==0;
+}
+function tryMove(nx, nz) {
+  var pad=0.6;
+  if(!isBlocked(nx+pad,nz)&&!isBlocked(nx-pad,nz)&&!isBlocked(nx,nz+pad)&&!isBlocked(nx,nz-pad)){
+    playerPos.x=nx; playerPos.z=nz;
+  }
+}
+function movePlayer(dt) {
+  var spd=MOVE_SPEED*dt*60;
+  var cos=Math.cos(playerAngle), sin=Math.sin(playerAngle);
+  if(keys['ArrowUp']   ||keys['w']||keys['W']) tryMove(playerPos.x+cos*spd, playerPos.z+sin*spd);
+  if(keys['ArrowDown'] ||keys['s']||keys['S']) tryMove(playerPos.x-cos*spd, playerPos.z-sin*spd);
+  if(keys['ArrowLeft'] ||keys['a']||keys['A']) playerAngle-=TURN_SPEED*dt*60;
+  if(keys['ArrowRight']||keys['d']||keys['D']) playerAngle+=TURN_SPEED*dt*60;
+}
+
+// ── Nearby + Interact ─────────────────────────────────
+function checkNearby() {
+  if(encounterOpen){nearbyDino=null;nearbyEgg=null;document.getElementById('prompt').style.display='none';return;}
+  nearbyDino=null; nearbyEgg=null;
+  var best=6.5;
+  for(var i=0;i<dinoGroups.length;i++){
+    if(!dinoGroups[i]) continue;
+    var d=playerPos.distanceTo(dinoGroups[i].position);
+    if(d<best){best=d;nearbyDino=DINO_DEFS[i];}
+  }
+  for(var j=0;j<eggObjs.length;j++){
+    if(EGG_DEFS[j].found) continue;
+    if(playerPos.distanceTo(eggObjs[j].position)<4.2){nearbyEgg=EGG_DEFS[j];nearbyDino=null;}
+  }
+  document.getElementById('prompt').style.display=(nearbyDino||nearbyEgg)?'block':'none';
+}
+
+function interact() {
+  if(!gameRunning||encounterOpen) return;
+  if(nearbyEgg){
+    nearbyEgg.found=true; eggCount++;
+    document.getElementById('eggCount').textContent=eggCount;
+    var em=eggObjs[EGG_DEFS.indexOf(nearbyEgg)]; if(em) em.visible=false;
+    showEncounterPanel('🥚 DINOSAUR EGG DISCOVERED!',
+      'You found a warm, vibrating dinosaur egg! 🐣\nThis speckled egg is still incubating — you can feel something moving inside!\nHandle with care, a living dinosaur is growing in there!', null);
+    showToast('🥚 Egg found! ('+eggCount+'/5)');
+    checkWin(); return;
+  }
+  if(nearbyDino){
+    if(!nearbyDino.found){
+      nearbyDino.found=true; dinoCount++;
+      document.getElementById('dinoCount').textContent=dinoCount;
+      dinoSnd(); showToast('🦖 '+nearbyDino.name+' discovered! ('+dinoCount+'/6)');
+      checkWin();
+    }
+    showEncounterPanel(
+      '🦖 '+nearbyDino.name.toUpperCase()+'  ·  '+nearbyDino.era,
+      'You are face to face with a '+nearbyDino.name+'!\n\n🦕 '+nearbyDino.fact,
+      nearbyDino
+    );
+  }
+}
+function checkWin(){ if(dinoCount>=6&&eggCount>=5) setTimeout(doWin,1500); }
+
+function showEncounterPanel(title, msg, def) {
+  document.getElementById('encTitle').textContent = title;
+  document.getElementById('encMsg').textContent   = msg;
+  document.getElementById('encounter').style.display = 'flex';
+  encounterOpen = true;
+  if(def) showEncModelOf(def);
+  else stopEncModel();
+}
+function closeEncounter() {
+  document.getElementById('encounter').style.display='none';
+  encounterOpen=false;
+  stopEncModel();
+}
+function showToast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg; el.style.display='block'; toastTimer=170;
+}
+
+// ── Minimap ────────────────────────────────────────────
+var mmC=document.getElementById('mm'), mctx=mmC.getContext('2d');
+mmC.width=120; mmC.height=120;
+var CS=120/COLS;
+function drawMinimap(){
+  mctx.fillStyle='#080f04'; mctx.fillRect(0,0,120,120);
+  for(var mr=0;mr<ROWS;mr++) for(var mc=0;mc<COLS;mc++){
+    var mv=MAP[mr][mc]; if(!mv) continue;
+    mctx.fillStyle=mv===1?'#285010':mv===2?'#605848':mv===3?'#1848a0':'#383020';
+    mctx.fillRect(mc*CS,mr*CS,CS-.4,CS-.4);
+  }
+  for(var mdi=0;mdi<DINO_DEFS.length;mdi++){
+    var dd=DINO_DEFS[mdi];
+    mctx.fillStyle=dd.found?'#c8ff80':'#ff7030';
+    mctx.beginPath(); mctx.arc(dd.wx/TILE*CS+CS/2,dd.wz/TILE*CS+CS/2,CS*.65,0,Math.PI*2); mctx.fill();
+  }
+  for(var mei=0;mei<EGG_DEFS.length;mei++){
+    if(EGG_DEFS[mei].found) continue;
+    mctx.fillStyle='#ffe033';
+    mctx.beginPath(); mctx.arc(EGG_DEFS[mei].wx/TILE*CS+CS/2,EGG_DEFS[mei].wz/TILE*CS+CS/2,CS*.5,0,Math.PI*2); mctx.fill();
+  }
+  var px2=playerPos.x/TILE*CS, pz2=playerPos.z/TILE*CS;
+  mctx.fillStyle='#fff'; mctx.beginPath(); mctx.arc(px2,pz2,CS*.75,0,Math.PI*2); mctx.fill();
+  mctx.strokeStyle='#80c0ff'; mctx.lineWidth=1;
+  mctx.beginPath(); mctx.moveTo(px2,pz2); mctx.lineTo(px2+Math.cos(playerAngle)*CS*2.2,pz2+Math.sin(playerAngle)*CS*2.2); mctx.stroke();
+}
+
+// ── Dino Book ──────────────────────────────────────────
+function openBook(){
+  var html='';
+  for(var i=0;i<DINO_DEFS.length;i++){
+    var d=DINO_DEFS[i];
+    html+='<div class="dinoCard '+(d.found?'found':'')+'">'+
+      '<div class="dIcon">'+(d.found?d.icon:'❓')+'</div>'+
+      '<div class="dName">'+(d.found?d.name:'???')+'</div>'+
+      '<div class="dFact">'+d.fact+'</div></div>';
+  }
+  document.getElementById('dinoGrid').innerHTML=html;
+  document.getElementById('dinoBook').style.display='flex';
+}
+function closeBook(){ document.getElementById('dinoBook').style.display='none'; }
+
+// ── Sounds ─────────────────────────────────────────────
+var AudioCtx=window.AudioContext||window.webkitAudioContext; var ac=null;
+function getAC(){if(!ac)ac=new AudioCtx();return ac;}
+function dinoSnd(){
+  try{var a=getAC(),freqs=[200,165,240,300];
+    for(var i=0;i<freqs.length;i++)(function(f,delay){setTimeout(function(){
+      var o=a.createOscillator(),g=a.createGain(),fl=a.createBiquadFilter();
+      fl.type='lowpass';fl.frequency.value=700;
+      o.connect(fl);fl.connect(g);g.connect(a.destination);
+      o.type='sawtooth';o.frequency.value=f;
+      g.gain.setValueAtTime(.28,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.55);
+      o.start();o.stop(a.currentTime+.55);
+    },delay);})(freqs[i],i*130);
+  }catch(e){}
+}
+function winSnd(){var freqs=[523,659,784,1046,1318];
+  for(var i=0;i<freqs.length;i++)(function(f,delay){setTimeout(function(){
+    try{var a=getAC(),o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(.25,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.42);
+    o.start();o.stop(a.currentTime+.42);}catch(e){}
+  },delay);})(freqs[i],i*130);
+}
+
+// ── Win ────────────────────────────────────────────────
+function doWin(){
+  winSnd();
+  document.getElementById('cardTitle').textContent='PARK COMPLETE!';
+  document.getElementById('cardMsg').innerHTML='🏆 You explored all of Dino World!<br><br>🦖 All 6 dinosaurs found!<br>🥚 All 5 eggs discovered!<br><br>You\'re the greatest paleontologist ever! 🌿👑';
+  document.getElementById('cardBtn').textContent='PLAY AGAIN';
+  document.getElementById('overlay').style.display='flex';
+  gameRunning=false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════════
+function animate(){
+  requestAnimationFrame(animate);
+  var dt=Math.min(clock.getDelta(),.05);
+
+  if(gameRunning){
+    movePlayer(dt);
+    checkNearby();
+    if(toastTimer>0){toastTimer--;if(!toastTimer)document.getElementById('toast').style.display='none';}
+
+    for(var i=0;i<dinoGroups.length;i++){
+      var mg=dinoGroups[i]; if(!mg) continue;
+      var ud=mg.userData, def=DINO_DEFS[i];
+      if(def.isPtero){
+        ud.flyA+=dt*.38;
+        mg.position.x=def.wx+Math.cos(ud.flyA)*12;
+        mg.position.z=def.wz+Math.sin(ud.flyA)*12;
+        mg.position.y=ud.baseY+Math.sin(ud.flyA*2)*1.8;
+        mg.rotation.y=ud.flyA+Math.PI*.5;
+      } else {
+        ud.walkA+=dt*.7; mg.position.y+=Math.sin(ud.walkA)*.0015;
+        ud.idleA+=dt*.12; mg.rotation.y=Math.sin(ud.idleA)*.35;
+      }
+    }
+    for(var j=0;j<eggObjs.length;j++){
+      if(EGG_DEFS[j].found) continue;
+      var em2=eggObjs[j]; em2.userData.phase+=dt*2;
+      var s=.88+Math.sin(em2.userData.phase)*.14;
+      em2.userData.ring.scale.set(s,s,s);
+      em2.userData.ring.material.opacity=.35+Math.sin(em2.userData.phase)*.3;
+      em2.position.y=.62+Math.sin(em2.userData.phase*.65)*.1;
+    }
+  }
+
+  // Spin the model in the encounter popup
+  if(encAnimating&&encRenderer&&encModel){
+    encModel.rotation.y+=dt*.8;
+    encRenderer.render(encScene,encCamera);
+  }
+
+  camera.position.copy(playerPos);
+  camera.rotation.order='YXZ';
+  camera.rotation.y=-playerAngle;
+  camera.rotation.x=0;
+  renderer.render(scene,camera);
+  drawMinimap();
+}
+
+// ═══════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown',function(e){
+  keys[e.key]=true;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].indexOf(e.key)!==-1) e.preventDefault();
+  if((e.key==='e'||e.key==='E'||e.key===' ')&&gameRunning) interact();
+  if(e.key==='Escape') closeEncounter();
+});
+document.addEventListener('keyup',function(e){keys[e.key]=false;});
+
+function holdBtn(id,key){
+  var b=document.getElementById(id); if(!b) return;
+  b.addEventListener('mousedown',function(e){e.preventDefault();keys[key]=true;});
+  b.addEventListener('mouseup',function(){keys[key]=false;});
+  b.addEventListener('mouseleave',function(){keys[key]=false;});
+  b.addEventListener('touchstart',function(e){e.preventDefault();keys[key]=true;});
+  b.addEventListener('touchend',function(){keys[key]=false;});
+}
+holdBtn('bFwd','ArrowUp'); holdBtn('bBack','ArrowDown');
+holdBtn('bLeft','ArrowLeft'); holdBtn('bRight','ArrowRight');
+document.getElementById('bAct').addEventListener('click',function(){if(gameRunning)interact();});
+document.getElementById('bAct').addEventListener('touchstart',function(e){e.preventDefault();if(gameRunning)interact();});
+
+document.getElementById('cardBtn').addEventListener('click',function(){
+  for(var i=0;i<DINO_DEFS.length;i++) DINO_DEFS[i].found=false;
+  for(var j=0;j<EGG_DEFS.length;j++)  EGG_DEFS[j].found=false;
+  for(var k=0;k<eggObjs.length;k++)   eggObjs[k].visible=true;
+  dinoCount=0; eggCount=0;
+  document.getElementById('dinoCount').textContent='0';
+  document.getElementById('eggCount').textContent='0';
+  playerPos.set(13.5*TILE,1.75,1.8*TILE); playerAngle=Math.PI;
+  getAC(); gameRunning=true;
+  document.getElementById('overlay').style.display='none';
+});
+
+window.addEventListener('resize',function(){
+  var w=gw.clientWidth,h=gw.clientHeight;
+  renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();
+});
+
+animate();
+</script>
+</body>
+</html>

@@ -1225,40 +1225,40 @@ function stopChickButtAttack() {
   el.innerHTML = '';
 }
 
-loader.load('https://clobot.games/Chick.glb',
-  function(gltf) {
-    CHICK_SPOTS.forEach(function(spot) {
-      var chick = gltf.scene.clone();
-      var box = new THREE.Box3().setFromObject(chick);
-      var sz = new THREE.Vector3(); box.getSize(sz);
-      var maxD = Math.max(sz.x, sz.y, sz.z);
-      var sc = 0.5 / maxD;
-      chick.scale.set(sc, sc, sc);
-      box.setFromObject(chick);
-      var baseY = -box.min.y * sc;
-      chick.position.set(spot.wx, baseY, spot.wz);
-      chick.rotation.y = Math.random() * Math.PI * 2;
-      chick.traverse(function(m) { if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
-      // Each chick has its own speed — variable for comedy!
-      var spd = 0.04 + Math.random() * 0.11; // some slow waddles, some ZOOM
-      chick.userData = {
-        bobPhase: Math.random()*Math.PI*2,
-        baseY: baseY,
-        homeX: spot.wx,
-        homeZ: spot.wz,
-        chasing: false,
-        speed: spd,
-        wanderA: Math.random()*Math.PI*2,
-        peepTimer: 0
-      };
-      scene.add(chick);
-      chickGroups.push(chick);
-    });
-    console.log('Chicks loaded! 🐣');
-  },
-  null,
-  function(err) { console.warn('Chick load failed'); }
-);
+// CHICKS DISABLED — uncomment to re-enable
+// loader.load('https://clobot.games/Chick.glb',
+//   function(gltf) {
+//     CHICK_SPOTS.forEach(function(spot) {
+//       var chick = gltf.scene.clone();
+//       var box = new THREE.Box3().setFromObject(chick);
+//       var sz = new THREE.Vector3(); box.getSize(sz);
+//       var maxD = Math.max(sz.x, sz.y, sz.z);
+//       var sc = 0.5 / maxD;
+//       chick.scale.set(sc, sc, sc);
+//       box.setFromObject(chick);
+//       var baseY = -box.min.y * sc;
+//       chick.position.set(spot.wx, baseY, spot.wz);
+//       chick.rotation.y = Math.random() * Math.PI * 2;
+//       chick.traverse(function(m) { if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
+//       var spd = 0.04 + Math.random() * 0.11;
+//       chick.userData = {
+//         bobPhase: Math.random()*Math.PI*2,
+//         baseY: baseY,
+//         homeX: spot.wx,
+//         homeZ: spot.wz,
+//         chasing: false,
+//         speed: spd,
+//         wanderA: Math.random()*Math.PI*2,
+//         peepTimer: 0
+//       };
+//       scene.add(chick);
+//       chickGroups.push(chick);
+//     });
+//     console.log('Chicks loaded! 🐣');
+//   },
+//   null,
+//   function(err) { console.warn('Chick load failed'); }
+// );
 
 // ═══════════════════════════════════════════════════════
 //  PAPER PLANE — flies lazy circles around the park!

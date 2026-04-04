@@ -214,6 +214,61 @@ body {
   border-top-color: #c8ff80;
 }
 
+/* Chompy hug button */
+#hugBtn {
+  margin-top: 12px;
+  background: linear-gradient(135deg, #ff6b9d, #ff8866);
+  border: none; border-radius: 12px;
+  padding: 11px 24px;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 22px; letter-spacing: 2px;
+  color: white; cursor: pointer;
+  box-shadow: 0 4px 0 #c04060;
+  transition: transform 0.1s;
+  display: none;
+  animation: hugBtnBounce 0.8s ease-in-out infinite alternate;
+}
+#hugBtn:hover { filter: brightness(1.1); }
+#hugBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #c04060; }
+@keyframes hugBtnBounce {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.06); }
+}
+
+/* Chompy hug celebration */
+#hugCelebration {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,100,150,0.92), rgba(255,150,80,0.92));
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 40; gap: 10px;
+  animation: hugFlash 0.3s ease-out;
+}
+@keyframes hugFlash {
+  from { opacity: 0; transform: scale(1.05); }
+  to   { opacity: 1; transform: scale(1); }
+}
+#hugCelebration .hug-emoji {
+  font-size: 100px;
+  animation: hugSpin 0.6s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes hugSpin {
+  0%   { transform: scale(0) rotate(-20deg); }
+  70%  { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+#hugCelebration .hug-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 42px; color: white; letter-spacing: 4px;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+}
+#hugCelebration .hug-msg {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px; font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  text-align: center; max-width: 280px; line-height: 1.6;
+}
+
 /* Dialogue choices */
 #encChoices {
   display: flex; flex-direction: column; gap: 7px; margin-top: 10px;
@@ -387,9 +442,8 @@ a.back:hover { color:#c8ff80; }
   </div>
 
   <div id="hud">
-    <div class="hpill">🦖 <span id="dinoCount">0</span>/6 Dinos</div>
-    <div class="hpill">🥚 <span id="eggCount">0</span>/5 Eggs</div>
-    <div class="hpill" id="bookBtn" onclick="openBook()">📋 Field Guide</div>
+    <div class="hpill">🦖 Chompy: <span id="chompyStatus">not found yet</span></div>
+    <div class="hpill">🌊 Arms: <span id="armCount">0</span>/4</div>
   </div>
 
   <div id="xhair"></div>
@@ -406,7 +460,14 @@ a.back:hover { color:#c8ff80; }
       <h3 id="encTitle"></h3>
       <p id="encMsg"></p>
       <div id="encChoices"></div>
+      <button id="hugBtn" onclick="giveChompyHug()">🤗 HUG CHOMPY!!</button>
     </div>
+  </div>
+
+  <div id="hugCelebration">
+    <div class="hug-emoji">🤗</div>
+    <div class="hug-title">CHOMPY GOT A HUG!!</div>
+    <div class="hug-msg" id="hugMsg"></div>
   </div>
 
   <div id="eatenScreen">
@@ -427,23 +488,21 @@ a.back:hover { color:#c8ff80; }
   </div>
   <button id="bAct">🤝</button>
 
-  <div id="overlay" style="display:flex;">
+  <div id="overlay" style="display:none;">
     <div id="card">
       <div class="jpsub">⚡ JURASSIC PARK ⚡</div>
       <h2 id="cardTitle">DINO WORLD</h2>
       <p id="cardMsg">
-        Welcome to <b style="color:#c8ff80">Dino World!</b><br>
-        Walk through a real 3D Jurassic Park!<br><br>
-        🦖 Find <b>6 dino friends</b> in the park<br>
-        🥚 Discover <b>5 hidden eggs</b><br>
-        🌿 Explore the jungle and paddocks<br>
-        ⚠️ <b style="color:#ff9966">Some dinos are secretly dangerous...</b><br>
-        <i style="color:#aaa;font-size:11px">Choose your words carefully. 👀</i><br><br>
-        <b>← → Arrow keys</b> to turn<br>
-        <b>↑ ↓ Arrow keys</b> to walk<br>
-        <b>Space</b> to jump · <b>E or tap 🤝</b> to interact
+        🦖 <b style="color:#c8ff80">Chompy the T-Rex</b> has wanted a hug for <b>65 million years.</b><br>
+        His arms are too tiny to reach. 😭<br><br>
+        <b style="color:#ffe033">Your mission:</b><br>
+        🌊 Find <b>4 pool noodle arm extensions</b> hidden in the park<br>
+        🤗 Return to Chompy and give him the hug of a lifetime!<br><br>
+        ⚠️ <b style="color:#ff9966">Watch out — some dinos are dangerous!</b><br>
+        <i style="color:#aaa;font-size:11px">Say the wrong thing and you'll be eaten. 👀</i><br><br>
+        <b>← → </b> turn · <b>↑ ↓</b> walk · <b>Space</b> jump · <b>E / 🤝</b> interact
       </p>
-      <button id="cardBtn">ENTER THE PARK</button>
+      <button id="cardBtn">START THE MISSION!</button>
     </div>
   </div>
 
@@ -578,10 +637,10 @@ var MAP=[
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,3,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -656,7 +715,6 @@ for(var fi=0;fi<400;fi++){
   scene.add(fm);
 }
 
-
 // Entrance arch
 (function(){
   var am=makeMat(0x5a4a2a);
@@ -679,7 +737,7 @@ var DINO_DEFS = [
   { id:'trex',    name:'Chompy',      era:'The Lonely Hugger 🤗', icon:'🦖',
     fact:'Chompy just wants a hug SO badly. His arms are too tiny to reach anyone and it makes him very sad. He has been chasing visitors hoping ONE of them will finally hug him back. Please be his friend. 😭',
     wx:4.5*TILE, wz:4.5*TILE,
-    modelFile:'https://clobot.games/cute_dino.glb', modelScale:1.5, modelY:0,
+    modelFile:'../cute_dino.glb', modelScale:1.5, modelY:0,
     bodyColor:0x3a5a28, darkColor:0x223a18,
     bodyScale:[1.3,1.0,2.2], legH:1.8, legW:0.42, neckLen:0.8,
     headW:0.88, headH:0.7, tailLen:2.6, biped:true,
@@ -688,14 +746,13 @@ var DINO_DEFS = [
   { id:'trice',   name:'Trixie',      era:'The Three-Horned Cutie 🌸', icon:'🦕',
     fact:'Trixie has THREE horns and a big beautiful frill that turns pink when she is happy! She loves flowers and head-booping her friends.',
     wx:23.5*TILE, wz:4.5*TILE,
-    modelFile:'https://clobot.games/cute_red_childrens_dino.glb', modelScale:1.5, modelY:0,
-    bodyColor:0x6a7040, darkColor:0x4a5028,
+    modelFile:'../cute_red_childrens_dino.glb', modelScale:1.5, modelY:0,    bodyColor:0x6a7040, darkColor:0x4a5028,
     bodyScale:[1.7,1.0,3.0], legH:1.3, legW:0.44, neckLen:0.5,
     headW:1.3, headH:0.85, tailLen:1.4, biped:false, hasFrill:true,
     found:false },
   { id:'brachio', name:'Noodleneck',  era:'The Tallest Noodle 🍜', icon:'🦕',
     fact:'Noodleneck has the longest neck in the WHOLE park and can eat leaves from the very tippy top of trees! She loves tickling birds with her nose.',
-    wx:14*TILE, wz:14.5*TILE,
+    wx:11*TILE, wz:11*TILE,
     modelScale:3.0, modelY:0,
     bodyColor:0x5a7840, darkColor:0x3a5828,
     bodyScale:[2.0,1.5,3.5], legH:2.5, legW:0.50, neckLen:4.5,
@@ -704,7 +761,7 @@ var DINO_DEFS = [
   { id:'raptor',  name:'Claw',        era:'The Sneaky Speedster 💨', icon:'🦖',
     fact:'Claw is super fast and extra clever! She and her friends make up secret plans together. She is also secretly very cuddly but do NOT tell anyone.',
     wx:4.5*TILE, wz:22.5*TILE,
-    modelFile:'https://clobot.games/cute_red_dino.glb', modelScale:2.0, modelY:0,
+    modelFile:'../cute_red_dino.glb', modelScale:2.0, modelY:0,
     bodyColor:0x7a6858, darkColor:0x5a4838,
     bodyScale:[0.7,0.65,1.4], legH:1.1, legW:0.22, neckLen:0.7,
     headW:0.52, headH:0.44, tailLen:1.9, biped:true,
@@ -818,36 +875,6 @@ var dinoGroups = [];
 
 function buildShapeDino(def) {
   var g = new THREE.Group();
-
-  // Ptero builds its own body — skip standard body parts
-  if (def.isPtero) {
-    var pb=new THREE.Mesh(new THREE.SphereGeometry(.65,8,6),makeMat(def.bodyColor));
-    pb.scale.set(1,.58,1.9); g.add(pb);
-    var ph=new THREE.Mesh(new THREE.SphereGeometry(.38,8,6),makeMat(def.bodyColor));
-    ph.position.set(0,.22,-1.1); g.add(ph);
-    var pbk=new THREE.Mesh(new THREE.CylinderGeometry(.055,.02,1,5),makeMat(def.darkColor));
-    pbk.rotation.x=Math.PI/2; pbk.position.set(0,.2,-1.82); g.add(pbk);
-    function makeWing(side){
-      var wg=new THREE.BufferGeometry();
-      var verts=new Float32Array([0,0,0,side*4.2,.3,-.2,side*3.8,0,-1.8,0,0,0,side*3.8,0,-1.8,side*.4,0,-1.4]);
-      wg.setAttribute('position',new THREE.BufferAttribute(verts,3)); wg.computeVertexNormals();
-      g.add(new THREE.Mesh(wg,new THREE.MeshLambertMaterial({color:def.bodyColor,side:THREE.DoubleSide})));
-    }
-    makeWing(1); makeWing(-1);
-    for(var ei=0;ei<2;ei++){
-      var es=[-1,1][ei];
-      var eye=new THREE.Mesh(new THREE.SphereGeometry(.06,6,4),new THREE.MeshBasicMaterial({color:0xffee00}));
-      eye.position.set(es*.28,.38,-1.3); g.add(eye);
-      var pupil=new THREE.Mesh(new THREE.SphereGeometry(.035,5,4),new THREE.MeshBasicMaterial({color:0x080808}));
-      pupil.position.set(es*.3,.38,-1.45); g.add(pupil);
-    }
-    g.position.set(def.wx,16,def.wz);
-    g.userData={def:def,flyA:Math.random()*Math.PI*2,baseY:14,walkA:0,idleA:0};
-    g.traverse(function(m){if(m.isMesh){m.castShadow=true;m.receiveShadow=true;}});
-    scene.add(g);
-    return g;
-  }
-
   var bx=def.bodyScale[0], by=def.bodyScale[1], bz=def.bodyScale[2];
 
   var body=new THREE.Mesh(new THREE.SphereGeometry(1,9,7),makeMat(def.bodyColor));
@@ -918,8 +945,26 @@ function buildShapeDino(def) {
     }
   }
 
-  g.position.set(def.wx,0,def.wz);
-  g.userData={def:def,flyA:0,baseY:0,walkA:Math.random()*Math.PI*2,idleA:Math.random()*Math.PI*2};
+  if(def.isPtero){
+    var pb=new THREE.Mesh(new THREE.SphereGeometry(.65,8,6),makeMat(def.bodyColor));
+    pb.scale.set(1,.58,1.9); g.add(pb);
+    var ph=new THREE.Mesh(new THREE.SphereGeometry(.38,8,6),makeMat(def.bodyColor));
+    ph.position.set(0,.22,-1.1); g.add(ph);
+    var pbk=new THREE.Mesh(new THREE.CylinderGeometry(.055,.02,1,5),makeMat(def.darkColor));
+    pbk.rotation.x=Math.PI/2; pbk.position.set(0,.2,-1.82); g.add(pbk);
+    function makeWing(side){
+      var wg=new THREE.BufferGeometry();
+      var verts=new Float32Array([0,0,0,side*4.2,.3,-.2,side*3.8,0,-1.8,0,0,0,side*3.8,0,-1.8,side*.4,0,-1.4]);
+      wg.setAttribute('position',new THREE.BufferAttribute(verts,3)); wg.computeVertexNormals();
+      g.add(new THREE.Mesh(wg,new THREE.MeshLambertMaterial({color:def.bodyColor,side:THREE.DoubleSide})));
+    }
+    makeWing(1); makeWing(-1);
+    g.position.set(def.wx,16,def.wz);
+    g.userData={def:def,flyA:Math.random()*Math.PI*2,baseY:14,walkA:0,idleA:0};
+  } else {
+    g.position.set(def.wx,0,def.wz);
+    g.userData={def:def,flyA:0,baseY:0,walkA:Math.random()*Math.PI*2,idleA:Math.random()*Math.PI*2};
+  }
 
   g.traverse(function(m){if(m.isMesh){m.castShadow=true;m.receiveShadow=true;}});
   scene.add(g);
@@ -1016,32 +1061,63 @@ setTimeout(function() {
 }, 200);
 
 // ═══════════════════════════════════════════════════════
-//  EGGS
+//  POOL NOODLE ARM EXTENSIONS 🌊
 // ═══════════════════════════════════════════════════════
-var EGG_DEFS=[
-  {wx:6.5*TILE,wz:6.2*TILE,  color:0xd0c0a0,found:false},
-  {wx:22.5*TILE,wz:6.2*TILE, color:0xa8c8d8,found:false},
-  {wx:13*TILE,wz:15*TILE,  color:0xd0a8c0,found:false},
-  {wx:6.5*TILE,wz:22.5*TILE, color:0xb8d8a0,found:false},
-  {wx:22.5*TILE,wz:22.5*TILE,color:0xffe0a0,found:false}
+var ARM_DEFS = [
+  { wx:6.5*TILE,  wz:6.2*TILE,  color:0xff6688, name:'Left Upper Arm',  found:false },
+  { wx:22.5*TILE, wz:6.2*TILE,  color:0x44bbff, name:'Right Upper Arm', found:false },
+  { wx:6.5*TILE,  wz:22.5*TILE, color:0xffcc00, name:'Left Lower Arm',  found:false },
+  { wx:22.5*TILE, wz:22.5*TILE, color:0x88ff44, name:'Right Lower Arm', found:false },
 ];
-var eggObjs=[];
-for(var egi=0;egi<EGG_DEFS.length;egi++){
-  var ed=EGG_DEFS[egi];
-  var eg=new THREE.Group();
-  var eb=new THREE.Mesh(new THREE.SphereGeometry(.52,9,7),makeMat(ed.color));
-  eb.scale.set(1,1.3,1); eg.add(eb);
-  for(var sp=0;sp<10;sp++){
-    var espot=new THREE.Mesh(new THREE.SphereGeometry(.065,5,4),makeMat(0x786858));
-    var phi=Math.random()*Math.PI,theta=Math.random()*Math.PI*2;
-    espot.position.set(Math.sin(phi)*Math.cos(theta)*.5,Math.cos(phi)*.64,Math.sin(phi)*Math.sin(theta)*.5);
-    eg.add(espot);
-  }
-  var ering=new THREE.Mesh(new THREE.TorusGeometry(.72,.04,6,18),new THREE.MeshBasicMaterial({color:0xffdd00,transparent:true,opacity:.65}));
-  ering.rotation.x=Math.PI/2; ering.position.y=-.1; eg.add(ering);
-  eg.position.set(ed.wx,.62,ed.wz); eg.castShadow=true;
-  eg.userData={eggDef:ed,ring:ering,phase:Math.random()*Math.PI*2};
-  scene.add(eg); eggObjs.push(eg);
+var armObjs = [];
+var armCount = 0;
+
+for (var armi = 0; armi < ARM_DEFS.length; armi++) {
+  (function(ad) {
+    var g = new THREE.Group();
+
+    // Pool noodle = a long wiggly cylinder in a fun colour!
+    var noodleMat = makeMat(ad.color);
+    // Main noodle body (horizontal, like an arm)
+    var noodle = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 2.2, 10), noodleMat);
+    noodle.rotation.z = Math.PI / 2;
+    noodle.position.y = 1.2;
+    g.add(noodle);
+
+    // Fun bumps along it (pool noodle has rings!)
+    for (var ri = 0; ri < 6; ri++) {
+      var ring = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.045, 7, 12), makeMat(ad.color * 0.7 + 0x111111));
+      ring.rotation.y = Math.PI / 2;
+      ring.position.set(-0.9 + ri * 0.36, 1.2, 0);
+      g.add(ring);
+    }
+
+    // End caps (rounded)
+    [-1.1, 1.1].forEach(function(ex) {
+      var cap = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 6), noodleMat);
+      cap.position.set(ex, 1.2, 0);
+      g.add(cap);
+    });
+
+    // Glowing halo ring underneath so you can spot it
+    var halo = new THREE.Mesh(
+      new THREE.TorusGeometry(0.7, 0.05, 6, 18),
+      new THREE.MeshBasicMaterial({ color: ad.color, transparent: true, opacity: 0.8 })
+    );
+    halo.rotation.x = Math.PI / 2;
+    halo.position.y = 0.1;
+    g.add(halo);
+
+    // Little sparkle light
+    var pl = new THREE.PointLight(ad.color, 1.2, 4);
+    pl.position.y = 1.2;
+    g.add(pl);
+
+    g.position.set(ad.wx, 0, ad.wz);
+    g.userData = { armDef: ad, halo: halo, phase: Math.random() * Math.PI * 2 };
+    scene.add(g);
+    armObjs.push(g);
+  })(ARM_DEFS[armi]);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1225,40 +1301,40 @@ function stopChickButtAttack() {
   el.innerHTML = '';
 }
 
-// CHICKS DISABLED — uncomment to re-enable
-// loader.load('https://clobot.games/Chick.glb',
-//   function(gltf) {
-//     CHICK_SPOTS.forEach(function(spot) {
-//       var chick = gltf.scene.clone();
-//       var box = new THREE.Box3().setFromObject(chick);
-//       var sz = new THREE.Vector3(); box.getSize(sz);
-//       var maxD = Math.max(sz.x, sz.y, sz.z);
-//       var sc = 0.5 / maxD;
-//       chick.scale.set(sc, sc, sc);
-//       box.setFromObject(chick);
-//       var baseY = -box.min.y * sc;
-//       chick.position.set(spot.wx, baseY, spot.wz);
-//       chick.rotation.y = Math.random() * Math.PI * 2;
-//       chick.traverse(function(m) { if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
-//       var spd = 0.04 + Math.random() * 0.11;
-//       chick.userData = {
-//         bobPhase: Math.random()*Math.PI*2,
-//         baseY: baseY,
-//         homeX: spot.wx,
-//         homeZ: spot.wz,
-//         chasing: false,
-//         speed: spd,
-//         wanderA: Math.random()*Math.PI*2,
-//         peepTimer: 0
-//       };
-//       scene.add(chick);
-//       chickGroups.push(chick);
-//     });
-//     console.log('Chicks loaded! 🐣');
-//   },
-//   null,
-//   function(err) { console.warn('Chick load failed'); }
-// );
+loader.load('../Chick.glb',
+  function(gltf) {
+    CHICK_SPOTS.forEach(function(spot) {
+      var chick = gltf.scene.clone();
+      var box = new THREE.Box3().setFromObject(chick);
+      var sz = new THREE.Vector3(); box.getSize(sz);
+      var maxD = Math.max(sz.x, sz.y, sz.z);
+      var sc = 0.5 / maxD;
+      chick.scale.set(sc, sc, sc);
+      box.setFromObject(chick);
+      var baseY = -box.min.y * sc;
+      chick.position.set(spot.wx, baseY, spot.wz);
+      chick.rotation.y = Math.random() * Math.PI * 2;
+      chick.traverse(function(m) { if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
+      // Each chick has its own speed — variable for comedy!
+      var spd = 0.04 + Math.random() * 0.11; // some slow waddles, some ZOOM
+      chick.userData = {
+        bobPhase: Math.random()*Math.PI*2,
+        baseY: baseY,
+        homeX: spot.wx,
+        homeZ: spot.wz,
+        chasing: false,
+        speed: spd,
+        wanderA: Math.random()*Math.PI*2,
+        peepTimer: 0
+      };
+      scene.add(chick);
+      chickGroups.push(chick);
+    });
+    console.log('Chicks loaded! 🐣');
+  },
+  null,
+  function(err) { console.warn('Chick load failed'); }
+);
 
 // ═══════════════════════════════════════════════════════
 //  PAPER PLANE — flies lazy circles around the park!
@@ -1272,7 +1348,7 @@ var PLANE_CZ = 14 * TILE;
 var PLANE_Y  = 9;
 var PLANE_SPEED = 0.25;
 
-loader.load('https://clobot.games/paper_plane.glb',
+loader.load('../paper_plane.glb',
   function(gltf) {
     planeGroup = gltf.scene;
     var box = new THREE.Box3().setFromObject(planeGroup);
@@ -1300,10 +1376,11 @@ var PLAYER_GROUND_Y = 1.75;
 var isJumping   = false;
 var keys        = {};
 var gameRunning = false;
-var dinoCount   = 0, eggCount = 0;
+var chompyFound = false;
+var armCount    = 0;
+var nearbyDino  = null, nearbyArm = null;
 var encounterOpen = false;
 var toastTimer  = 0;
-var nearbyDino  = null, nearbyEgg = null;
 var clock       = new THREE.Clock();
 
 function doJump() {
@@ -1381,8 +1458,54 @@ function chompySadSound() {
   } catch(e) {}
 }
 
+function chompyHugSound() {
+  try {
+    var a = getAC();
+    // Happy ascending tones!
+    var freqs = [523, 659, 784, 1046, 1318, 1568];
+    freqs.forEach(function(f, i) {
+      setTimeout(function() {
+        var o = a.createOscillator(), g = a.createGain();
+        o.connect(g); g.connect(a.destination);
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.28, a.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.5);
+        o.start(); o.stop(a.currentTime + 0.5);
+      }, i * 100);
+    });
+  } catch(e) {}
+}
+
+var CHOMPY_HUG_MSGS = [
+  "This is the best day of my entire 65 million years!! 😭🤗",
+  "I... I actually did it. I got a hug. I need a moment. 😭",
+  "MY TINY ARMS ARE SO HAPPY RIGHT NOW EVEN THOUGH THEY COULDN'T REACH!!",
+  "I'm going to go tell my therapist. She is going to be SO proud of me. 🥹",
+  "You are my best friend forever and I will never forget this. NEVER.",
+];
+var chompyHugged = false;
+
+function giveChompyHug() {
+  closeEncounter();
+  chompyHugged = true;
+  chompyHugSound();
+  var msg = CHOMPY_HUG_MSGS[Math.floor(Math.random() * CHOMPY_HUG_MSGS.length)];
+  document.getElementById('hugMsg').textContent = '"' + msg + '" — Chompy 🦖';
+  var cel = document.getElementById('hugCelebration');
+  cel.style.display = 'flex';
+  // Make the emoji spin again by re-adding it
+  cel.querySelector('.hug-emoji').style.animation = 'none';
+  setTimeout(function() {
+    cel.querySelector('.hug-emoji').style.animation = 'hugSpin 0.6s cubic-bezier(.36,.07,.19,.97)';
+  }, 10);
+  setTimeout(function() {
+    cel.style.display = 'none';
+    // Chompy stops chasing and wanders happily forever after
+    showChompyMsg("😊 ...thank you. I feel much better now. 🤗");
+  }, 3500);
+}
+
 function showChompyMsg(msg) {
-  var el = document.getElementById('chompyMsg');
   if (!el) {
     el = document.createElement('div');
     el.id = 'chompyMsg';
@@ -1441,15 +1564,16 @@ function updateChompy(dt) {
       // Show the encounter panel with Chompy's sad message
       if (!encounterOpen) {
         if (!def.found) {
-          def.found = true; dinoCount++;
-          document.getElementById('dinoCount').textContent = dinoCount;
+          def.found = true;
           dinoSnd();
           checkWin();
         }
         showEncounterPanel(
           '🦖 CHOMPY · The Lonely Hugger 🤗',
-          'Chompy ran all the way over here to hug you...\n\n"I just wanted ONE hug. ONE! My arms have NEVER reached anyone in 65 million years. Do you know how that feels?? I have been to therapy. I do journaling. Nothing helps.\n\nWill you please be my friend? We can talk about it." 😭\n\n💔 Chompy is now following you around hoping for a hug.',
-          def
+          chompyHugged
+            ? '"Thank you again for the hug. I think about it every day." 😊🤗'
+            : 'Chompy ran all the way over here...\n\n"I just wanted ONE hug. ONE! My arms have NEVER reached anyone in 65 million years. Do you know how that feels??\n\nWill you please... just... one hug?" 😭',
+          def, null, !chompyHugged
         );
       }
     }
@@ -1472,62 +1596,68 @@ function updateChompy(dt) {
   }
 }
 function checkNearby() {
-  if(encounterOpen){nearbyDino=null;nearbyEgg=null;document.getElementById('prompt').style.display='none';return;}
-  nearbyDino=null; nearbyEgg=null;
+  if(encounterOpen){nearbyDino=null;nearbyArm=null;document.getElementById('prompt').style.display='none';return;}
+  nearbyDino=null; nearbyArm=null;
   var best=6.5;
   for(var i=0;i<dinoGroups.length;i++){
     if(!dinoGroups[i]) continue;
     var d=playerPos.distanceTo(dinoGroups[i].position);
     if(d<best){best=d;nearbyDino=DINO_DEFS[i];}
   }
-  for(var j=0;j<eggObjs.length;j++){
-    if(EGG_DEFS[j].found) continue;
-    if(playerPos.distanceTo(eggObjs[j].position)<4.2){nearbyEgg=EGG_DEFS[j];nearbyDino=null;}
+  for(var j=0;j<armObjs.length;j++){
+    if(ARM_DEFS[j].found) continue;
+    if(playerPos.distanceTo(armObjs[j].position)<4.2){nearbyArm=ARM_DEFS[j];nearbyDino=null;}
   }
-  document.getElementById('prompt').style.display=(nearbyDino||nearbyEgg)?'block':'none';
+  document.getElementById('prompt').style.display=(nearbyDino||nearbyArm)?'block':'none';
 }
 
 function interact() {
   if(!gameRunning||encounterOpen) return;
-  if(nearbyEgg){
-    nearbyEgg.found=true; eggCount++;
-    document.getElementById('eggCount').textContent=eggCount;
-    var em=eggObjs[EGG_DEFS.indexOf(nearbyEgg)]; if(em) em.visible=false;
-    showEncounterPanel('🥚 DINOSAUR EGG DISCOVERED!',
-      'You found a warm, vibrating dinosaur egg! 🐣\nThis speckled egg is still incubating — you can feel something moving inside!\nHandle with care, a living dinosaur is growing in there!', null, null);
-    showToast('🥚 Egg found! ('+eggCount+'/5)');
+  // Pick up an arm extension!
+  if(nearbyArm){
+    nearbyArm.found=true; armCount++;
+    document.getElementById('armCount').textContent=armCount;
+    var idx=ARM_DEFS.indexOf(nearbyArm);
+    if(armObjs[idx]) armObjs[idx].visible=false;
+    armPickupSound();
+    showEncounterPanel('🌊 ARM PIECE FOUND! ('+armCount+'/4)',
+      'You found the '+nearbyArm.name+'! 🌊\n\n'+
+      (armCount<4
+        ? 'A bright inflatable pool noodle arm extension! Chompy is going to LOVE this!!\n\nFind '+(4-armCount)+' more piece'+(4-armCount===1?'':'s')+'!'
+        : 'THAT\'S ALL 4!! Go find Chompy RIGHT NOW!! He has been waiting 65 MILLION YEARS!! 🏃💨'),
+      null, null, false);
     checkWin(); return;
   }
+  // Talk to a dino!
   if(nearbyDino){
-    if(!nearbyDino.found){
-      nearbyDino.found=true; dinoCount++;
-      document.getElementById('dinoCount').textContent=dinoCount;
-      dinoSnd(); showToast('🦖 '+nearbyDino.name+' discovered! ('+dinoCount+'/6)');
-      checkWin();
-    }
-    // Chompy gets his special sad panel (set by updateChompy already, but also callable here)
-    if(nearbyDino.id === 'trex') {
+    if(nearbyDino.id==='trex'){
+      if(!chompyFound){
+        chompyFound=true;
+        document.getElementById('chompyStatus').textContent='found! 😭';
+      }
       showEncounterPanel(
         '🦖 CHOMPY  ·  The Lonely Hugger 🤗',
-        'Chompy waddles up to you, tiny arms outstretched...\n\n"Hi. I just want to say. I have been trying to hug someone for 65 million years and my arms STILL don\'t reach. I am doing okay. I am NOT crying. These are just... eye rain. Anyway. Will you be my friend? We can talk about feelings." 😭',
-        nearbyDino, null
+        armCount>=4
+          ? '😭 "YOU\'RE BACK!! And you have ALL FOUR arm pieces!! I can\'t believe this is happening!! PLEASE PUT THEM ON ME!! I want my hug!!"'
+          : (chompyHugged
+              ? '"You came back!! I still think about the hug. Every. Single. Day. 😊 Did you find all 4 arm pieces yet??"'
+              : '"Oh... hello. I\'m Chompy. 😭\n\nI have wanted a hug for 65 million years but my arms don\'t reach. They NEVER reach.\n\nI heard there are 4 pool noodle arm extensions hidden around the park. If someone could find them all for me... I could finally hug someone.\n\nWill you help me? Please?" 😭🥹'),
+        nearbyDino, null, armCount>=4&&!chompyHugged
       );
       return;
     }
-    // All other dinos get the conversation / danger system!
-    var convo = DINO_CONVOS[nearbyDino.id];
-    if (!convo) { showEncounterPanel('🦖 '+nearbyDino.name.toUpperCase(), nearbyDino.fact, nearbyDino, null); return; }
-    var dangerous = isDangerous(nearbyDino.id);
-    var greeting = dangerous ? convo.dangerGreeting : convo.safeGreeting;
+    // All other dinos — dangerous conversation system!
+    var convo=DINO_CONVOS[nearbyDino.id];
+    if(!convo) return;
+    var dangerous=isDangerous(nearbyDino.id);
     showEncounterPanel(
-      (dangerous ? '⚠️ ' : '🌿 ') + nearbyDino.name.toUpperCase() + '  ·  ' + nearbyDino.era,
-      greeting + '\n\n' + convo.question,
-      nearbyDino,
-      buildChoices(nearbyDino, convo, dangerous)
+      (dangerous?'⚠️ ':'🌿 ')+nearbyDino.name.toUpperCase()+'  ·  '+nearbyDino.era,
+      (dangerous?convo.dangerGreeting:convo.safeGreeting)+'\n\n'+convo.question,
+      nearbyDino, buildChoices(nearbyDino,convo,dangerous), false
     );
   }
 }
-function checkWin(){ if(dinoCount>=6&&eggCount>=5) setTimeout(doWin,1500); }
+function checkWin(){ if(armCount>=4&&chompyHugged) setTimeout(doWin,1500); }
 
 function buildChoices(def, convo, dangerous) {
   // Shuffle choices for variety
@@ -1557,15 +1687,14 @@ function buildChoices(def, convo, dangerous) {
   });
 }
 
-function showEncounterPanel(title, msg, def, choices) {
+function showEncounterPanel(title, msg, def, choices, showHug) {
   document.getElementById('encTitle').textContent = title;
   document.getElementById('encMsg').textContent   = msg;
   document.getElementById('encounter').style.display = 'flex';
   encounterOpen = true;
-  // Show or hide close button
   var closeBtn = document.getElementById('encClose');
   closeBtn.style.display = choices && choices.length ? 'none' : 'block';
-  // Render choices
+  document.getElementById('hugBtn').style.display = showHug ? 'block' : 'none';
   var choicesEl = document.getElementById('encChoices');
   choicesEl.innerHTML = '';
   if (choices && choices.length) {
@@ -1741,7 +1870,6 @@ function updateDinoTags() {
 }
 
 function showToast(msg){
-  var el=document.getElementById('toast');
   el.textContent=msg; el.style.display='block'; toastTimer=170;
 }
 
@@ -1758,16 +1886,13 @@ function drawMinimap(){
   }
   for(var mdi=0;mdi<DINO_DEFS.length;mdi++){
     var dd=DINO_DEFS[mdi];
-    var dg=dinoGroups[mdi];
-    var dmx=dd.wx, dmz=dd.wz;
-    if(dg){dmx=dg.position.x;dmz=dg.position.z;}
     mctx.fillStyle=dd.found?'#c8ff80':'#ff7030';
-    mctx.beginPath(); mctx.arc(dmx/TILE*CS+CS/2,dmz/TILE*CS+CS/2,CS*.65,0,Math.PI*2); mctx.fill();
+    mctx.beginPath(); mctx.arc(dd.wx/TILE*CS+CS/2,dd.wz/TILE*CS+CS/2,CS*.65,0,Math.PI*2); mctx.fill();
   }
-  for(var mei=0;mei<EGG_DEFS.length;mei++){
-    if(EGG_DEFS[mei].found) continue;
-    mctx.fillStyle='#ffe033';
-    mctx.beginPath(); mctx.arc(EGG_DEFS[mei].wx/TILE*CS+CS/2,EGG_DEFS[mei].wz/TILE*CS+CS/2,CS*.5,0,Math.PI*2); mctx.fill();
+  for(var mei=0;mei<ARM_DEFS.length;mei++){
+    if(ARM_DEFS[mei].found) continue;
+    mctx.fillStyle='#ff88cc';
+    mctx.beginPath(); mctx.arc(ARM_DEFS[mei].wx/TILE*CS+CS/2,ARM_DEFS[mei].wz/TILE*CS+CS/2,CS*.5,0,Math.PI*2); mctx.fill();
   }
   var px2=playerPos.x/TILE*CS, pz2=playerPos.z/TILE*CS;
   mctx.fillStyle='#fff'; mctx.beginPath(); mctx.arc(px2,pz2,CS*.75,0,Math.PI*2); mctx.fill();
@@ -1805,6 +1930,17 @@ function dinoSnd(){
     },delay);})(freqs[i],i*130);
   }catch(e){}
 }
+function armPickupSound(){
+  try{var a=getAC(),freqs=[440,550,660,880,1100];
+    for(var i=0;i<freqs.length;i++)(function(f,delay){setTimeout(function(){
+      var o=a.createOscillator(),g=a.createGain();
+      o.connect(g);g.connect(a.destination);
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(.22,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.3);
+      o.start();o.stop(a.currentTime+.3);
+    },delay);})(freqs[i],i*80);
+  }catch(e){}
+}
 function winSnd(){var freqs=[523,659,784,1046,1318];
   for(var i=0;i<freqs.length;i++)(function(f,delay){setTimeout(function(){
     try{var a=getAC(),o=a.createOscillator(),g=a.createGain();
@@ -1817,8 +1953,8 @@ function winSnd(){var freqs=[523,659,784,1046,1318];
 // ── Win ────────────────────────────────────────────────
 function doWin(){
   winSnd();
-  document.getElementById('cardTitle').textContent='PARK COMPLETE!';
-  document.getElementById('cardMsg').innerHTML='🏆 You explored all of Dino World!<br><br>🦖 All 6 dinosaurs found!<br>🥚 All 5 eggs discovered!<br><br>You\'re the greatest paleontologist ever! 🌿👑';
+  document.getElementById('cardTitle').textContent='CHOMPY GOT HIS HUG!!';
+  document.getElementById('cardMsg').innerHTML='🤗 <b style="color:#c8ff80">MISSION COMPLETE!!</b><br><br>🌊 All 4 pool noodle arm extensions found!<br>🦖 Chompy got his very first hug in 65 MILLION years!!<br><br>"I... I can\'t believe it. This is the best day of my entire existence. My tiny arms finally reached. Well... with pool noodles. But still.\n\nThank you. 😭🤗" — Chompy<br><br>👑 You are the greatest hero in dinosaur history!';
   document.getElementById('cardBtn').textContent='PLAY AGAIN';
   document.getElementById('overlay').style.display='flex';
   gameRunning=false;
@@ -1931,13 +2067,17 @@ function animate(){
         ud.idleA+=dt*.12; mg.rotation.y=Math.sin(ud.idleA)*.35;
       }
     }
-    for(var j=0;j<eggObjs.length;j++){
-      if(EGG_DEFS[j].found) continue;
-      var em2=eggObjs[j]; em2.userData.phase+=dt*2;
-      var s=.88+Math.sin(em2.userData.phase)*.14;
-      em2.userData.ring.scale.set(s,s,s);
-      em2.userData.ring.material.opacity=.35+Math.sin(em2.userData.phase)*.3;
-      em2.position.y=.62+Math.sin(em2.userData.phase*.65)*.1;
+    for(var j=0;j<armObjs.length;j++){
+      if(ARM_DEFS[j].found) continue;
+      var ao=armObjs[j]; ao.userData.phase+=dt*1.8;
+      // Gentle float up and down
+      ao.position.y=Math.sin(ao.userData.phase)*0.15;
+      // Slow spin
+      ao.rotation.y+=dt*0.6;
+      // Pulse the halo
+      var hs=0.9+Math.sin(ao.userData.phase)*0.15;
+      ao.userData.halo.scale.set(hs,hs,hs);
+      ao.userData.halo.material.opacity=0.5+Math.sin(ao.userData.phase)*0.3;
     }
   }
 
@@ -1982,20 +2122,22 @@ document.getElementById('bAct').addEventListener('click',function(){if(gameRunni
 document.getElementById('bAct').addEventListener('touchstart',function(e){e.preventDefault();if(gameRunning)interact();});
 
 document.getElementById('cardBtn').addEventListener('click',function(){
+  // Reset dino states
   for(var i=0;i<DINO_DEFS.length;i++) DINO_DEFS[i].found=false;
-  for(var j=0;j<EGG_DEFS.length;j++)  EGG_DEFS[j].found=false;
-  for(var k=0;k<eggObjs.length;k++)   eggObjs[k].visible=true;
-  dinoCount=0; eggCount=0;
-  document.getElementById('dinoCount').textContent='0';
-  document.getElementById('eggCount').textContent='0';
+  // Reset arm extensions
+  for(var j=0;j<ARM_DEFS.length;j++) ARM_DEFS[j].found=false;
+  for(var k=0;k<armObjs.length;k++)  armObjs[k].visible=true;
+  // Reset counters
+  armCount=0;
+  chompyFound=false;
+  document.getElementById('armCount').textContent='0';
+  document.getElementById('chompyStatus').textContent='not found yet';
+  // Reset player
   playerPos.set(13.5*TILE,1.75,1.8*TILE); playerAngle=Math.PI;
   isJumping=false; playerVY=0;
-  chompyChasing=false; chompyGaveUp=false; chompySadTimer=0; chompyTalkIndex=0;
-  // Reset Chompy back to his starting position
-  if(dinoGroups[0]) {
-    dinoGroups[0].position.x = DINO_DEFS[0].wx;
-    dinoGroups[0].position.z = DINO_DEFS[0].wz;
-  }
+  // Reset Chompy
+  chompyChasing=false; chompyGaveUp=false; chompySadTimer=0; chompyTalkIndex=0; chompyHugged=false;
+  // Randomise danger and start!
   randomiseDanger();
   initDinoTags();
   getAC(); gameRunning=true;

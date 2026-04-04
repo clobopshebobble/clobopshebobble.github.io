@@ -697,7 +697,7 @@ var DINO_DEFS = [
   { id:'trex',    name:'Chompy',      era:'The Lonely Hugger 🤗', icon:'🦖',
     fact:'Chompy just wants a hug SO badly. His arms are too tiny to reach anyone and it makes him very sad. He has been chasing visitors hoping ONE of them will finally hug him back. Please be his friend. 😭',
     wx:4.5*TILE, wz:4.5*TILE,
-    modelFile:'../cute_dino.glb', modelScale:1.5, modelY:0,
+    modelFile:'../cute_dino.glb', modelScale:3.0, modelY:0,
     bodyColor:0x3a5a28, darkColor:0x223a18,
     bodyScale:[1.3,1.0,2.2], legH:1.8, legW:0.42, neckLen:0.8,
     headW:0.88, headH:0.7, tailLen:2.6, biped:true,
@@ -706,7 +706,7 @@ var DINO_DEFS = [
   { id:'trice',   name:'Trixie',      era:'The Three-Horned Cutie 🌸', icon:'🦕',
     fact:'Trixie has THREE horns and a big beautiful frill that turns pink when she is happy! She loves flowers and head-booping her friends.',
     wx:23.5*TILE, wz:4.5*TILE,
-    modelFile:'../cute_red_childrens_dino.glb', modelScale:1.5, modelY:0,    bodyColor:0x6a7040, darkColor:0x4a5028,
+    modelFile:'../cute_red_childrens_dino.glb', modelScale:3.0, modelY:0,    bodyColor:0x6a7040, darkColor:0x4a5028,
     bodyScale:[1.7,1.0,3.0], legH:1.3, legW:0.44, neckLen:0.5,
     headW:1.3, headH:0.85, tailLen:1.4, biped:false, hasFrill:true,
     found:false },
@@ -721,7 +721,7 @@ var DINO_DEFS = [
   { id:'raptor',  name:'Claw',        era:'The Sneaky Speedster 💨', icon:'🦖',
     fact:'Claw is super fast and extra clever! She and her friends make up secret plans together. She is also secretly very cuddly but do NOT tell anyone.',
     wx:4.5*TILE, wz:22.5*TILE,
-    modelFile:'../cute_red_dino.glb', modelScale:2.0, modelY:0,
+    modelFile:'../cute_red_dino.glb', modelScale:4.0, modelY:0,
     bodyColor:0x7a6858, darkColor:0x5a4838,
     bodyScale:[0.7,0.65,1.4], legH:1.1, legW:0.22, neckLen:0.7,
     headW:0.52, headH:0.44, tailLen:1.9, biped:true,
@@ -1173,6 +1173,21 @@ function stopEncModel() {
 
 
 // ═══════════════════════════════════════════════════════
+//  PAPER PLANE — big lazy circles over the park ✈️
+// ═══════════════════════════════════════════════════════
+var planeGroup = null, planeAngle = 0;
+var PLANE_RADIUS = 12*TILE, PLANE_CX = 14*TILE, PLANE_CZ = 14*TILE, PLANE_Y = 12, PLANE_SPEED = 0.2;
+loader.load('../paper_plane.glb', function(gltf) {
+  planeGroup = gltf.scene;
+  var box = new THREE.Box3().setFromObject(planeGroup);
+  var sz = new THREE.Vector3(); box.getSize(sz);
+  var sc = 4.5 / Math.max(sz.x, sz.y, sz.z); // nice and big!
+  planeGroup.scale.set(sc, sc, sc);
+  planeGroup.traverse(function(m) { if(m.isMesh) m.castShadow=true; });
+  scene.add(planeGroup);
+}, null, function() { console.warn('Plane load failed'); });
+
+// ═══════════════════════════════════════════════════════
 //  PLAYER
 // ═══════════════════════════════════════════════════════
 var playerPos   = new THREE.Vector3(13.5*TILE, 1.75, 1.8*TILE);
@@ -1287,11 +1302,169 @@ function chompyHugSound() {
 var CHOMPY_HUG_MSGS = [
   "This is the best day of my entire 65 million years!! 😭🤗",
   "I... I actually did it. I got a hug. I need a moment. 😭",
-  "MY TINY ARMS ARE SO HAPPY RIGHT NOW EVEN THOUGH THEY COULDN'T REACH!!",
+  "MY POOL NOODLE ARMS ARE SO LONG NOW!! I CAN REACH EVERYONE!!",
   "I'm going to go tell my therapist. She is going to be SO proud of me. 🥹",
   "You are my best friend forever and I will never forget this. NEVER.",
 ];
 var chompyHugged = false;
+var chompyNoodleArms = null; // the pool noodle arm 3D objects attached to Chompy
+var chompyHugTour = false;   // is Chompy running around hugging everyone?
+var chompyHugTourIndex = 0;  // which dino he's hugging next
+var chompyHugTourTimer = 0;
+var DINO_HUG_REACTIONS = {
+  trice:   '"CHOMPY!! You finally got arms!! I am SO happy for you!! 🌸🤗"',
+  brachio: '"Oh my goodness!! I can feel it!! You reached me!! 🍜🤗"',
+  raptor:  '"...I will allow this hug. Just this once. Do not tell anyone. 💨🤗"',
+  stego:   '"MY PLATES ARE THE PINKEST THEY HAVE EVER BEEN RIGHT NOW!! 💖🤗"',
+  ptero:   '"SCREEE!! That is the best hug I have ever received mid-flight!! 🦅🤗"',
+};
+
+// Build pool noodle arms and attach to Chompy's model
+function attachNoodleArms() {
+  var g = dinoGroups[0];
+  if (!g) return;
+
+  // Remove old noodle arms if any
+  if (chompyNoodleArms) { g.remove(chompyNoodleArms); chompyNoodleArms = null; }
+
+  var armGroup = new THREE.Group();
+  var colors = [0xff6688, 0x44bbff, 0xffcc00, 0x88ff44];
+
+  [-1, 1].forEach(function(side, si) {
+    var armSeg = new THREE.Group();
+    // Upper arm noodle
+    var upper = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.12, 1.4, 10),
+      new THREE.MeshLambertMaterial({ color: colors[si * 2] })
+    );
+    upper.rotation.z = side * 1.1;
+    upper.position.set(side * 0.7, 0, 0);
+    armSeg.add(upper);
+
+    // Ring bumps
+    for (var ri = 0; ri < 4; ri++) {
+      var ring = new THREE.Mesh(
+        new THREE.TorusGeometry(0.13, 0.03, 6, 10),
+        new THREE.MeshLambertMaterial({ color: colors[si * 2 + 1] })
+      );
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(side * (0.35 + ri * 0.28), Math.sin(side * 1.1) * (0.35 + ri * 0.28), 0);
+      armSeg.add(ring);
+    }
+
+    // Lower arm noodle (extends further!)
+    var lower = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.10, 0.10, 1.2, 10),
+      new THREE.MeshLambertMaterial({ color: colors[si * 2 + 1] })
+    );
+    lower.rotation.z = side * 1.5;
+    lower.position.set(side * 1.5, -0.3, 0);
+    armSeg.add(lower);
+
+    // Hand cap
+    var hand = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 8, 6),
+      new THREE.MeshLambertMaterial({ color: colors[si * 2] })
+    );
+    hand.position.set(side * 2.1, -0.55, 0);
+    armSeg.add(hand);
+
+    armGroup.add(armSeg);
+  });
+
+  // Position at Chompy's arm height (mid-body)
+  armGroup.position.set(0, 1.2, -0.3);
+  g.add(armGroup);
+  chompyNoodleArms = armGroup;
+}
+
+// Show a floating heart above a dino
+function showHugHeart(dinoGroup, reactionText) {
+  if (!dinoGroup) return;
+  // Project the dino's position to screen and show a floating emoji
+  var heartEl = document.createElement('div');
+  heartEl.style.cssText = 'position:absolute;font-size:36px;z-index:20;pointer-events:none;animation:heartFloat 2.5s ease-out forwards;';
+  heartEl.textContent = '🤗❤️';
+  document.getElementById('gameWrap').appendChild(heartEl);
+
+  // Add CSS animation if not already there
+  if (!document.getElementById('heartAnim')) {
+    var style = document.createElement('style');
+    style.id = 'heartAnim';
+    style.textContent = '@keyframes heartFloat { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-80px) scale(1.5)} }';
+    document.head.appendChild(style);
+  }
+
+  // Position over the dino using 3D projection
+  function updatePos() {
+    var wp = new THREE.Vector3(dinoGroup.position.x, dinoGroup.position.y + 8, dinoGroup.position.z);
+    var proj = wp.clone().project(camera);
+    var gw2 = document.getElementById('gameWrap');
+    var sx = (proj.x * 0.5 + 0.5) * gw2.clientWidth;
+    var sy = (proj.y * -0.5 + 0.5) * gw2.clientHeight;
+    heartEl.style.left = (sx - 20) + 'px';
+    heartEl.style.top  = (sy - 40) + 'px';
+  }
+  updatePos();
+
+  // Show reaction message
+  if (reactionText) showChompyMsg(reactionText);
+
+  setTimeout(function() {
+    if (heartEl.parentNode) heartEl.parentNode.removeChild(heartEl);
+  }, 2500);
+}
+
+// Chompy's post-hug tour — run to each dino and hug them!
+var HUG_TOUR_ORDER = ['trice','brachio','raptor','stego','ptero'];
+function startChompyHugTour() {
+  chompyHugTour = true;
+  chompyHugTourIndex = 0;
+  chompyHugTourTimer = 1.5; // small delay before starting
+  showChompyMsg("I'M GOING TO HUG EVERYONE!! NOBODY IS SAFE FROM MY NOODLE ARMS!! 🤗🌊");
+}
+
+function updateChompyHugTour(dt, g) {
+  if (!chompyHugTour || !g) return;
+  chompyHugTourTimer -= dt;
+  if (chompyHugTourTimer > 0) return;
+
+  if (chompyHugTourIndex >= HUG_TOUR_ORDER.length) {
+    // Done hugging everyone!
+    chompyHugTour = false;
+    showChompyMsg("I hugged EVERYONE!! This is the greatest day in dinosaur history!! 😭🤗🌊");
+    return;
+  }
+
+  // Find the target dino
+  var targetId = HUG_TOUR_ORDER[chompyHugTourIndex];
+  var targetDef = null, targetGroup = null;
+  for (var i = 1; i < DINO_DEFS.length; i++) {
+    if (DINO_DEFS[i].id === targetId) { targetDef = DINO_DEFS[i]; targetGroup = dinoGroups[i]; break; }
+  }
+  if (!targetGroup) { chompyHugTourIndex++; return; }
+
+  var dx = targetGroup.position.x - g.position.x;
+  var dz = targetGroup.position.z - g.position.z;
+  var dist = Math.sqrt(dx*dx + dz*dz);
+
+  if (dist > 4) {
+    // Run toward target!
+    var spd = 0.18 * dt * 60;
+    g.position.x += (dx/dist) * spd;
+    g.position.z += (dz/dist) * spd;
+    g.rotation.y = Math.atan2(dx, dz);
+    // Noodle arms flap while running 😂
+    if (chompyNoodleArms) chompyNoodleArms.rotation.z = Math.sin(Date.now() * 0.01) * 0.3;
+  } else {
+    // HUG!!
+    var reaction = DINO_HUG_REACTIONS[targetId];
+    showHugHeart(targetGroup, reaction);
+    chompyHugSound();
+    chompyHugTourIndex++;
+    chompyHugTourTimer = 4.0; // pause before next dino
+  }
+}
 
 function giveChompyHug() {
   closeEncounter();
@@ -1301,19 +1474,23 @@ function giveChompyHug() {
   document.getElementById('hugMsg').textContent = '"' + msg + '" — Chompy 🦖';
   var cel = document.getElementById('hugCelebration');
   cel.style.display = 'flex';
-  // Make the emoji spin again by re-adding it
   cel.querySelector('.hug-emoji').style.animation = 'none';
   setTimeout(function() {
     cel.querySelector('.hug-emoji').style.animation = 'hugSpin 0.6s cubic-bezier(.36,.07,.19,.97)';
   }, 10);
   setTimeout(function() {
+    // Attach pool noodle arms to Chompy!
+    attachNoodleArms();
     cel.style.display = 'none';
-    // Chompy stops chasing and wanders happily forever after
-    showChompyMsg("😊 ...thank you. I feel much better now. 🤗");
+    showChompyMsg("I CAN FEEL THEM!! My new NOODLE ARMS!! They're so... LONG!! 🌊😭");
+    // Start the hug tour after a moment!
+    setTimeout(startChompyHugTour, 3000);
+    checkWin();
   }, 3500);
 }
 
 function showChompyMsg(msg) {
+  var el = document.getElementById('chompyMsg');
   if (!el) {
     el = document.createElement('div');
     el.id = 'chompyMsg';
@@ -1778,6 +1955,18 @@ function animate(){
     movePlayer(dt);
     checkNearby();
     updateChompy(dt);
+    updateChompyHugTour(dt, dinoGroups[0]);
+    if(planeGroup){
+      planeAngle += dt * PLANE_SPEED;
+      planeGroup.position.set(
+        PLANE_CX + Math.cos(planeAngle) * PLANE_RADIUS,
+        PLANE_Y + Math.sin(planeAngle * 1.5) * 2,
+        PLANE_CZ + Math.sin(planeAngle) * PLANE_RADIUS
+      );
+      planeGroup.rotation.y = -planeAngle - Math.PI * 0.5;
+      planeGroup.rotation.z = 0.3;
+      planeGroup.rotation.x = Math.sin(planeAngle * 1.5) * 0.12;
+    }
     if(toastTimer>0){toastTimer--;if(!toastTimer)document.getElementById('toast').style.display='none';}
 
     for(var i=0;i<dinoGroups.length;i++){
@@ -1864,6 +2053,7 @@ document.getElementById('cardBtn').addEventListener('click',function(){
   isJumping=false; playerVY=0;
   // Reset Chompy
   chompyChasing=false; chompyGaveUp=false; chompySadTimer=0; chompyTalkIndex=0; chompyHugged=false;
+  chompyHugTour=false; chompyHugTourIndex=0; chompyNoodleArms=null;
   // Randomise danger and start!
   randomiseDanger();
   initDinoTags();

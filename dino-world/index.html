@@ -1338,55 +1338,41 @@ function attachNoodleArms() {
   [-1, 1].forEach(function(side, si) {
     var armSeg = new THREE.Group();
 
-    // Main noodle — ABSURDLY long. Like, embarrassingly long.
-    var noodleLen = 14.0; // drags on the ground and beyond
+    // Main noodle — ABSURDLY long, going straight out to the side
+    var noodleLen = 16.0;
     var noodle = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.18, 0.18, noodleLen, 10),
-      new THREE.MeshLambertMaterial({ color: colors[si * 3] })
+      new THREE.CylinderGeometry(0.2, 0.2, noodleLen, 10),
+      new THREE.MeshLambertMaterial({ color: colors[si * 3 % colors.length] })
     );
-    // Angled outward and drooping down so it drags on the floor
-    noodle.rotation.z = side * 1.35;
-    noodle.position.set(side * 3.2, -1.8, 0);
+    // Straight out to the side — cylinder goes along Y axis, rotate to X axis
+    noodle.rotation.z = Math.PI / 2;
+    noodle.position.set(side * (noodleLen / 2), 0, 0);
     armSeg.add(noodle);
 
-    // Lots of colourful ring segments along the whole length
-    for (var ri = 0; ri < 12; ri++) {
+    // Colourful ring segments evenly along the arm
+    for (var ri = 0; ri < 14; ri++) {
       var ring = new THREE.Mesh(
-        new THREE.TorusGeometry(0.19, 0.045, 7, 12),
-        new THREE.MeshLambertMaterial({ color: colors[(si * 3 + ri) % colors.length] })
+        new THREE.TorusGeometry(0.22, 0.055, 7, 12),
+        new THREE.MeshLambertMaterial({ color: colors[(si * 2 + ri) % colors.length] })
       );
-      ring.rotation.x = Math.PI / 2;
-      var t = ri / 11;
-      ring.position.set(
-        side * (0.5 + t * 6.0),
-        -0.4 - t * 3.2, // droops down
-        0
-      );
+      ring.rotation.y = Math.PI / 2;
+      ring.position.set(side * (1.0 + ri * 1.1), 0, 0);
       armSeg.add(ring);
     }
 
-    // Second drooping segment — the tip just flops on the ground
-    var tip = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.16, 0.10, 5.0, 10),
-      new THREE.MeshLambertMaterial({ color: colors[(si * 3 + 2) % colors.length] })
-    );
-    tip.rotation.z = side * 0.3; // nearly horizontal, lying on the ground
-    tip.position.set(side * 7.5, -3.8, 0);
-    armSeg.add(tip);
-
-    // End cap flopping on the ground
+    // End cap
     var cap = new THREE.Mesh(
-      new THREE.SphereGeometry(0.22, 8, 6),
-      new THREE.MeshLambertMaterial({ color: colors[si * 3] })
+      new THREE.SphereGeometry(0.25, 8, 6),
+      new THREE.MeshLambertMaterial({ color: colors[si * 3 % colors.length] })
     );
-    cap.position.set(side * 10.0, -4.2, 0);
+    cap.position.set(side * (noodleLen + 0.3), 0, 0);
     armSeg.add(cap);
 
     armGroup.add(armSeg);
   });
 
-  // Sit at shoulder height
-  armGroup.position.set(0, 2.2, -0.2);
+  // Position at Chompy's shoulder height — no Y offset tricks, just attach cleanly
+  armGroup.position.set(0, 1.5, 0);
   g.add(armGroup);
   chompyNoodleArms = armGroup;
 }
@@ -1573,8 +1559,10 @@ function updateChompy(dt) {
           '🦖 CHOMPY · The Lonely Hugger 🤗',
           chompyHugged
             ? '"Thank you again for the hug. I think about it every day." 😊🤗'
-            : 'Chompy ran all the way over here...\n\n"I just wanted ONE hug. ONE! My arms have NEVER reached anyone in 65 million years. Do you know how that feels??\n\nWill you please... just... one hug?" 😭',
-          def, null, !chompyHugged
+            : armCount >= 4
+              ? '"YOU HAVE ALL FOUR PIECES!! Please... put them on me!! I\'m ready!! 😭🌊"'
+              : 'Chompy ran all the way over here...\n\n"I just wanted ONE hug. ONE! My arms have NEVER reached anyone in 65 million years.\n\nPlease find my pool noodle arm extensions... there are 4 pieces hidden in the park. Will you help me? 😭"',
+          def, null, armCount>=4&&!chompyHugged
         );
       }
     }

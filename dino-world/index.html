@@ -1319,61 +1319,67 @@ var DINO_HUG_REACTIONS = {
   ptero:   '"SCREEE!! That is the best hug I have ever received mid-flight!! 🦅🤗"',
 };
 
-// Build pool noodle arms and attach to Chompy's model
+// Build OBNOXIOUSLY long pool noodle arms and attach to Chompy
 function attachNoodleArms() {
   var g = dinoGroups[0];
   if (!g) return;
-
-  // Remove old noodle arms if any
   if (chompyNoodleArms) { g.remove(chompyNoodleArms); chompyNoodleArms = null; }
 
   var armGroup = new THREE.Group();
-  var colors = [0xff6688, 0x44bbff, 0xffcc00, 0x88ff44];
+  var colors = [0xff6688, 0x44bbff, 0xffcc00, 0x88ff44, 0xff9900, 0xcc44ff];
 
   [-1, 1].forEach(function(side, si) {
     var armSeg = new THREE.Group();
-    // Upper arm noodle
-    var upper = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.12, 0.12, 1.4, 10),
-      new THREE.MeshLambertMaterial({ color: colors[si * 2] })
-    );
-    upper.rotation.z = side * 1.1;
-    upper.position.set(side * 0.7, 0, 0);
-    armSeg.add(upper);
 
-    // Ring bumps
-    for (var ri = 0; ri < 4; ri++) {
+    // Main noodle — ABSURDLY long. Like, embarrassingly long.
+    var noodleLen = 14.0; // drags on the ground and beyond
+    var noodle = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.18, noodleLen, 10),
+      new THREE.MeshLambertMaterial({ color: colors[si * 3] })
+    );
+    // Angled outward and drooping down so it drags on the floor
+    noodle.rotation.z = side * 1.35;
+    noodle.position.set(side * 3.2, -1.8, 0);
+    armSeg.add(noodle);
+
+    // Lots of colourful ring segments along the whole length
+    for (var ri = 0; ri < 12; ri++) {
       var ring = new THREE.Mesh(
-        new THREE.TorusGeometry(0.13, 0.03, 6, 10),
-        new THREE.MeshLambertMaterial({ color: colors[si * 2 + 1] })
+        new THREE.TorusGeometry(0.19, 0.045, 7, 12),
+        new THREE.MeshLambertMaterial({ color: colors[(si * 3 + ri) % colors.length] })
       );
       ring.rotation.x = Math.PI / 2;
-      ring.position.set(side * (0.35 + ri * 0.28), Math.sin(side * 1.1) * (0.35 + ri * 0.28), 0);
+      var t = ri / 11;
+      ring.position.set(
+        side * (0.5 + t * 6.0),
+        -0.4 - t * 3.2, // droops down
+        0
+      );
       armSeg.add(ring);
     }
 
-    // Lower arm noodle (extends further!)
-    var lower = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.10, 0.10, 1.2, 10),
-      new THREE.MeshLambertMaterial({ color: colors[si * 2 + 1] })
+    // Second drooping segment — the tip just flops on the ground
+    var tip = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.16, 0.10, 5.0, 10),
+      new THREE.MeshLambertMaterial({ color: colors[(si * 3 + 2) % colors.length] })
     );
-    lower.rotation.z = side * 1.5;
-    lower.position.set(side * 1.5, -0.3, 0);
-    armSeg.add(lower);
+    tip.rotation.z = side * 0.3; // nearly horizontal, lying on the ground
+    tip.position.set(side * 7.5, -3.8, 0);
+    armSeg.add(tip);
 
-    // Hand cap
-    var hand = new THREE.Mesh(
-      new THREE.SphereGeometry(0.14, 8, 6),
-      new THREE.MeshLambertMaterial({ color: colors[si * 2] })
+    // End cap flopping on the ground
+    var cap = new THREE.Mesh(
+      new THREE.SphereGeometry(0.22, 8, 6),
+      new THREE.MeshLambertMaterial({ color: colors[si * 3] })
     );
-    hand.position.set(side * 2.1, -0.55, 0);
-    armSeg.add(hand);
+    cap.position.set(side * 10.0, -4.2, 0);
+    armSeg.add(cap);
 
     armGroup.add(armSeg);
   });
 
-  // Position at Chompy's arm height (mid-body)
-  armGroup.position.set(0, 1.2, -0.3);
+  // Sit at shoulder height
+  armGroup.position.set(0, 2.2, -0.2);
   g.add(armGroup);
   chompyNoodleArms = armGroup;
 }
@@ -1454,8 +1460,11 @@ function updateChompyHugTour(dt, g) {
     g.position.x += (dx/dist) * spd;
     g.position.z += (dz/dist) * spd;
     g.rotation.y = Math.atan2(dx, dz);
-    // Noodle arms flap while running 😂
-    if (chompyNoodleArms) chompyNoodleArms.rotation.z = Math.sin(Date.now() * 0.01) * 0.3;
+    // Noodle arms flap WILDLY while running 😂
+    if (chompyNoodleArms) {
+      chompyNoodleArms.rotation.z = Math.sin(Date.now() * 0.008) * 0.5;
+      chompyNoodleArms.rotation.x = Math.sin(Date.now() * 0.012) * 0.3;
+    }
   } else {
     // HUG!!
     var reaction = DINO_HUG_REACTIONS[targetId];

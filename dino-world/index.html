@@ -835,6 +835,13 @@ var dinoGroups = [];
 
 function buildShapeDino(def) {
   var g = new THREE.Group();
+  if (!def.bodyScale) def.bodyScale = [1,1,1];
+  if (!def.legH) def.legH = 1;
+  if (!def.legW) def.legW = 0.3;
+  if (!def.neckLen) def.neckLen = 0.5;
+  if (!def.headW) def.headW = 0.6;
+  if (!def.headH) def.headH = 0.5;
+  if (!def.tailLen) def.tailLen = 1.5;
   var bx=def.bodyScale[0], by=def.bodyScale[1], bz=def.bodyScale[2];
 
   var body=new THREE.Mesh(new THREE.SphereGeometry(1,9,7),makeMat(def.bodyColor));
@@ -1964,7 +1971,7 @@ function animate(){
     movePlayer(dt);
     checkNearby();
     updateChompy(dt);
-    updateChompyHugTour(dt, dinoGroups[0]);
+    if (dinoGroups[0]) updateChompyHugTour(dt, dinoGroups[0]);
     if(planeGroup){
       planeAngle += dt * PLANE_SPEED;
       planeGroup.position.set(

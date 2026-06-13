@@ -542,7 +542,7 @@ function clearDriveKeys() {
 }
 function initTouchControls() {
   const wrap = $('touchControls');
-  const tapPulseMs = 160;
+  const tapPulseMs = 420;
   const release = (button) => {
     if (button.dataset.key) keys[button.dataset.key] = false;
     button.classList.remove('is-down');

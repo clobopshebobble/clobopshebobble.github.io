@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Real Drive — first-person car on the real Earth</title>
+<style>
+  :root { --ink:#111111; --blue:#1a56db; --paper:#f5f3ee; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; overflow:hidden; background:#0b0d10; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#fff; }
+  #app { position:fixed; inset:0; }
+  canvas { display:block; }
+
+  /* ---- Key gate card ---- */
+  #gate { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:radial-gradient(120% 120% at 50% 0%, #14181d 0%, #0b0d10 60%, #060708 100%); z-index:50; padding:24px; }
+  .card { width:min(520px,100%); background:#15191e; border:1px solid #2a323b; border-radius:18px; padding:28px; box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .card h1 { margin:0 0 6px; font-size:22px; letter-spacing:-.02em; }
+  .card p { margin:0 0 18px; color:#9aa6b2; font-size:14px; line-height:1.5; }
+  .card input { width:100%; padding:13px 14px; border-radius:11px; border:1px solid #313a44; background:#0e1216; color:#fff; font-size:15px; outline:none; }
+  .card input:focus { border-color:var(--blue); }
+  .card button { margin-top:14px; width:100%; padding:13px; border:0; border-radius:11px; background:var(--blue); color:#fff; font-weight:600; font-size:15px; cursor:pointer; }
+  .card button:hover { filter:brightness(1.08); }
+  details { margin-top:16px; color:#9aa6b2; font-size:13px; }
+  details summary { cursor:pointer; color:#c7d0d9; }
+  details ol { padding-left:18px; line-height:1.6; }
+  details a { color:#6ea8ff; }
+
+  /* ---- HUD ---- */
+  #hud { position:fixed; left:16px; bottom:16px; z-index:20; font-variant-numeric:tabular-nums; pointer-events:none; text-shadow:0 1px 3px rgba(0,0,0,.8); }
+  #speed { font-size:40px; font-weight:700; letter-spacing:-.03em; line-height:1; }
+  #speed span { font-size:15px; font-weight:500; color:#cdd6df; margin-left:6px; }
+  #status { margin-top:6px; font-size:13px; color:#cdd6df; }
+  #help { position:fixed; right:16px; bottom:16px; z-index:20; font-size:12.5px; line-height:1.7; color:#cdd6df; text-align:right; text-shadow:0 1px 3px rgba(0,0,0,.8); pointer-events:none; }
+  #help b { color:#fff; }
+
+  /* ---- Preset places ---- */
+  #places { position:fixed; left:16px; top:16px; z-index:20; display:flex; gap:8px; flex-wrap:wrap; max-width:60vw; }
+  #places button { pointer-events:auto; background:rgba(20,24,29,.72); backdrop-filter:blur(8px); border:1px solid #2a323b; color:#e6ebf0; padding:7px 12px; border-radius:999px; font-size:12.5px; cursor:pointer; }
+  #places button:hover { border-color:var(--blue); }
+  #topright { position:fixed; right:16px; top:16px; z-index:20; display:flex; gap:8px; }
+  #topright button { pointer-events:auto; background:rgba(20,24,29,.72); backdrop-filter:blur(8px); border:1px solid #2a323b; color:#cdd6df; padding:6px 11px; border-radius:999px; font-size:12px; cursor:pointer; }
+  #topright button:hover { border-color:var(--blue); color:#fff; }
+  #carname { margin-top:4px; font-size:13px; color:#cdd6df; }
+  #tune { position:fixed; right:16px; top:50%; transform:translateY(-50%); z-index:21; width:190px; background:rgba(20,24,29,.82); backdrop-filter:blur(10px); border:1px solid #2a323b; border-radius:14px; padding:14px 14px 12px; display:flex; flex-direction:column; }
+  #tune .th { font-size:11px; font-weight:700; color:#fff; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+  #tune label { font-size:11.5px; color:#cdd6df; display:flex; justify-content:space-between; align-items:baseline; margin-top:9px; }
+  #tune label small { color:#7c8794; font-size:10px; }
+  #tune label span { color:#6ea8ff; font-weight:600; font-variant-numeric:tabular-nums; }
+  #tune input[type=range] { width:100%; accent-color:var(--blue); margin:4px 0 0; cursor:pointer; }
+  #tune #tunereset { margin-top:13px; background:rgba(40,46,54,.9); border:1px solid #2a323b; color:#cdd6df; padding:7px; border-radius:8px; font-size:12px; cursor:pointer; }
+  #tune #tunereset:hover { border-color:var(--blue); color:#fff; }
+  #drop { position:fixed; inset:0; z-index:40; display:none; align-items:center; justify-content:center; background:rgba(26,86,219,.18); border:3px dashed var(--blue); font-size:22px; font-weight:600; pointer-events:none; }
+  #drop.show { display:flex; }
+
+  /* ---- Touch driving controls ---- */
+  #touchControls { position:fixed; left:calc(12px + env(safe-area-inset-left)); right:calc(12px + env(safe-area-inset-right)); bottom:calc(12px + env(safe-area-inset-bottom)); z-index:22; display:none; grid-template-columns:1fr 1.25fr; gap:14px; align-items:end; pointer-events:none; }
+  .touch-pad { display:grid; gap:10px; pointer-events:auto; }
+  .touch-steer { grid-template-columns:repeat(2, minmax(52px, 64px)); justify-content:start; }
+  .touch-drive { grid-template-columns:repeat(3, minmax(52px, 64px)); justify-content:end; }
+  .touch-drive [data-key="KeyW"] { grid-column:2; grid-row:1; }
+  .touch-drive [data-key="KeyS"] { grid-column:2; grid-row:2; }
+  .touch-drive [data-key="ShiftLeft"] { grid-column:1; grid-row:1 / span 2; height:100%; }
+  .touch-drive [data-key="KeyB"] { grid-column:3; grid-row:1; }
+  .touch-drive [data-action="jump"] { grid-column:3; grid-row:2; }
+  .touch-btn { min-width:52px; height:56px; border:1px solid rgba(255,255,255,.22); border-radius:18px; background:rgba(9,12,16,.68); color:#fff; box-shadow:0 10px 24px rgba(0,0,0,.34); backdrop-filter:blur(10px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; font:700 12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; letter-spacing:.03em; text-transform:uppercase; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .touch-btn .glyph { font-size:21px; line-height:1; }
+  .touch-btn .caption { color:#cdd6df; font-size:9px; font-weight:700; letter-spacing:.08em; }
+  .touch-btn.primary { background:rgba(26,86,219,.78); border-color:rgba(151,190,255,.7); }
+  .touch-btn.is-down, .touch-btn:active { transform:translateY(1px) scale(.98); background:rgba(45,112,255,.88); border-color:#fff; }
+
+  @media (pointer:coarse), (max-width:780px) {
+    #touchControls:not(.hidden) { display:grid; }
+    #places { left:10px; right:10px; top:10px; max-width:none; flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    #places::-webkit-scrollbar { display:none; }
+    #places button { flex:0 0 auto; padding:8px 11px; }
+    #topright { top:54px; right:10px; gap:6px; }
+    #topright button { padding:7px 9px; font-size:11px; }
+    #hud { left:12px; bottom:calc(92px + env(safe-area-inset-bottom)); }
+    #speed { font-size:30px; }
+    #status, #carname { max-width:44vw; font-size:12px; }
+    #help { display:none; }
+    #tune { left:10px; right:10px; top:auto; bottom:calc(112px + env(safe-area-inset-bottom)); width:auto; max-height:42vh; transform:none; overflow:auto; }
+  }
+
+  @media (max-width:380px) {
+    #touchControls { grid-template-columns:.8fr 1.2fr; gap:8px; }
+    .touch-pad { gap:8px; }
+    .touch-steer, .touch-drive { grid-template-columns:repeat(2, minmax(48px, 56px)); }
+    .touch-drive [data-key="ShiftLeft"] { grid-column:1; grid-row:1; height:56px; }
+    .touch-drive [data-key="KeyW"] { grid-column:2; grid-row:1; }
+    .touch-drive [data-key="KeyS"] { grid-column:1; grid-row:2; }
+    .touch-drive [data-key="KeyB"] { grid-column:2; grid-row:2; }
+    .touch-drive [data-action="jump"] { grid-column:1 / span 2; grid-row:3; width:100%; }
+    .touch-btn { height:54px; border-radius:16px; }
+  }
+
+  /* ---- Error overlay (blind-debug aid) ---- */
+  #err { position:fixed; left:16px; right:16px; top:16px; z-index:60; display:none; background:#2a0d0d; border:1px solid #b3261e; color:#ffd9d6; padding:14px 16px; border-radius:12px; font-size:13px; line-height:1.5; white-space:pre-wrap; max-height:60vh; overflow:auto; }
+  #err b { color:#fff; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Key gate -->
+<div id="gate">
+  <div class="card">
+    <h1>🚗 Real Drive</h1>
+    <p>Drive a 3D car across the real Earth. Paste a <b>free Cesium ion token</b> (no credit card) — or a Google Maps key if you have one. The app detects which. Saved in this browser only.</p>
+    <input id="keyInput" type="password" placeholder="Cesium ion token (eyJ…)  or  Google key (AIza…)" autocomplete="off" spellcheck="false" />
+    <button id="startBtn">Start driving</button>
+    <details open>
+      <summary>🆓 Get a free Cesium ion token (≈1 min, no card)</summary>
+      <ol>
+        <li>Sign up at <a href="https://ion.cesium.com/signup" target="_blank" rel="noopener">ion.cesium.com/signup</a> — free.</li>
+        <li>Open the <b>Access Tokens</b> tab → copy the <b>default token</b> (starts with <code>eyJ</code>).</li>
+        <li>Paste it above. You get the real photoreal Google tiles within the free monthly quota. Hit a quota/permission wall? A one-click button drops you to always-free city blocks.</li>
+      </ol>
+    </details>
+    <details>
+      <summary>Or use a Google Maps key (needs billing)</summary>
+      <ol>
+        <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> → project → enable <b>billing</b>.</li>
+        <li>APIs &amp; Services → Library → enable <b>“Map Tiles API”</b>.</li>
+        <li>Credentials → <b>Create credentials → API key</b>, copy it.</li>
+      </ol>
+    </details>
+  </div>
+</div>
+
+<!-- Error overlay -->
+<div id="err"></div>
+<div id="drop">drop your Yaris .glb to drive it</div>
+
+<!-- In-world UI (hidden until started) -->
+<div id="places" class="hidden"></div>
+<div id="topright" class="hidden">
+  <button id="tunetoggle">⚙︎ tune</button>
+  <button id="loadcar">load car .glb</button>
+  <button id="resetkey">change key</button>
+</div>
+
+<div id="tune" class="hidden">
+  <div class="th">⚙︎ tuning</div>
+  <label>jump height <span id="vjump"></span></label><input type="range" id="sjump" min="6" max="90" step="1">
+  <label>gravity <small>(low = floaty)</small> <span id="vgrav"></span></label><input type="range" id="sgrav" min="2" max="40" step="1">
+  <label>top speed <span id="vspeed"></span></label><input type="range" id="sspeed" min="10" max="180" step="2">
+  <label>boost <span id="vboost"></span></label><input type="range" id="sboost" min="30" max="260" step="5">
+  <label>tire grip <span id="vgrip"></span></label><input type="range" id="sgrip" min="0.3" max="6" step="0.1">
+  <label>time of day <small>(sunset → noon)</small> <span id="vsun"></span></label><input type="range" id="ssun" min="1" max="85" step="1">
+  <button id="tunereset">reset defaults</button>
+</div>
+<input id="carfile" type="file" accept=".glb,.gltf" class="hidden" />
+<div id="hud" class="hidden">
+  <div id="speed">0<span>mph</span></div>
+  <div id="carname">🚗 …</div>
+  <div id="status">booting…</div>
+</div>
+<div id="help" class="hidden">
+  <b>W / S</b> drive · reverse<br>
+  <b>A / D</b> steer<br>
+  <b>B / Ctrl</b> brake<br>
+  <b>Shift</b> boost · <b>Space</b> jump<br>
+  <b>Shift+Space</b> big air<br>
+  <b>C</b> cockpit ⇄ chase cam<br>
+  <b>R</b> reset to start
+</div>
+<div id="touchControls" class="hidden" aria-label="Touch driving controls">
+  <div class="touch-pad touch-steer" aria-label="Steering controls">
+    <button class="touch-btn" type="button" data-key="KeyA" aria-label="Steer left"><span class="glyph">←</span><span class="caption">left</span></button>
+    <button class="touch-btn" type="button" data-key="KeyD" aria-label="Steer right"><span class="glyph">→</span><span class="caption">right</span></button>
+  </div>
+  <div class="touch-pad touch-drive" aria-label="Driving controls">
+    <button class="touch-btn" type="button" data-key="ShiftLeft" aria-label="Boost"><span class="glyph">↯</span><span class="caption">boost</span></button>
+    <button class="touch-btn primary" type="button" data-key="KeyW" aria-label="Drive forward"><span class="glyph">↑</span><span class="caption">drive</span></button>
+    <button class="touch-btn" type="button" data-key="KeyS" aria-label="Reverse"><span class="glyph">↓</span><span class="caption">back</span></button>
+    <button class="touch-btn" type="button" data-key="KeyB" aria-label="Brake"><span class="glyph">●</span><span class="caption">brake</span></button>
+    <button class="touch-btn" type="button" data-action="jump" aria-label="Jump"><span class="glyph">⤴</span><span class="caption">jump</span></button>
+  </div>
+</div>
+
+<!-- Single shared Three instance + tiles lib, both resolving `three` from the import map -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.170.0",
+    "three/addons/": "https://esm.sh/three@0.170.0/examples/jsm/",
+    "3d-tiles-renderer": "https://esm.sh/3d-tiles-renderer@0.4.28?external=three",
+    "3d-tiles-renderer/plugins": "https://esm.sh/3d-tiles-renderer@0.4.28/plugins?external=three",
+    "3d-tiles-renderer/core/plugins": "https://esm.sh/3d-tiles-renderer@0.4.28/core/plugins?external=three"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { TilesRenderer } from '3d-tiles-renderer';
+import { GoogleCloudAuthPlugin, CesiumIonAuthPlugin } from '3d-tiles-renderer/core/plugins';
+import { ReorientationPlugin, GLTFExtensionsPlugin, TileCompressionPlugin } from '3d-tiles-renderer/plugins';
+
+const $ = (id) => document.getElementById(id);
+
+// ---- Surface the truth: any crash lands on screen so we can fix it together ----
+const errBox = $('err');
+function showError(label, e) {
+  const msg = (e && (e.stack || e.message)) || String(e);
+  errBox.style.display = 'block';
+  errBox.innerHTML = `<b>${label}</b>\n` + msg;
+  console.error(label, e);
+}
+window.addEventListener('error',  (e) => showError('Runtime error', e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => showError('Async/loader error (often: bad/blocked API key, or Map Tiles API not enabled)', e.reason));
+
+// ---- Places you can jump to (lat, lon in degrees) ----
+const PLACES = [
+  { name: '🎣 OIB Pier',      lat: 33.8893, lon: -78.4842 },
+  { name: '🏖️ OIB Beach',     lat: 33.8896, lon: -78.4836 },
+  { name: '🌉 OIB Bridge',    lat: 33.9006, lon: -78.4290 },
+  { name: '⛱️ Sunset Beach',  lat: 33.8807, lon: -78.5169 },
+  { name: '🦀 Calabash',      lat: 33.8901, lon: -78.5666 },
+  { name: '🏝️ Holden Beach',  lat: 33.9140, lon: -78.2920 },
+  { name: '🛥️ Shallotte',     lat: 33.9735, lon: -78.3892 },
+  { name: '🗽 NYC',           lat: 40.7061, lon: -74.0087 },
+  { name: '🏜️ Grand Canyon',  lat: 36.0544, lon: -112.1401 },
+];
+
+const KEY_STORE = 'realdrive.gmpKey';
+const ASSET_STORE = 'realdrive.assetId';
+const ION_PHOTOREAL = '2275207';  // Google Photorealistic 3D Tiles, streamed via Cesium ion (free quota)
+const ION_OSM = '96188';          // Cesium OSM Buildings — always free, stylized city blocks
+// Baked-in default so the app auto-loads without the gate. Rotate in the Cesium ion dashboard if needed.
+const DEFAULT_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjM2NkMDdhYi0zNzYxLTQyYTYtYjE3OS01OTA1OGM5Zjk1MTMiLCJpZCI6MzkzOTgwLCJpYXQiOjE3NzE5ODY2NTZ9.qkbCfTtifUKvlxHvKgK1Bw3gZ0cprJdD96p3SCNei4g';
+
+// Auto-detect which credential was pasted: Google Maps key vs Cesium ion token.
+function detectCred(token) {
+  if (token.startsWith('eyJ')) {                       // Cesium ion tokens are JWTs (eyJ…)
+    return { mode:'ion', token, assetId: localStorage.getItem(ASSET_STORE) || ION_PHOTOREAL };
+  }
+  return { mode:'google', token };                     // Google Maps keys start with "AIza"
+}
+
+// Allow ?key=... in the URL too (then strip it from the address bar)
+const urlKey = new URLSearchParams(location.search).get('key');
+if (urlKey) { localStorage.setItem(KEY_STORE, urlKey.trim()); history.replaceState(null,'',location.pathname); }
+
+// Switch the free (ion) path to always-free OSM city blocks and reload
+window.__switchOsm = () => { localStorage.setItem(ASSET_STORE, ION_OSM); location.reload(); };
+
+// ---- Key gate wiring ----
+const gate = $('gate');
+$('startBtn').addEventListener('click', () => {
+  const k = $('keyInput').value.trim();
+  if (!k) { $('keyInput').focus(); return; }
+  localStorage.setItem(KEY_STORE, k);
+  boot(detectCred(k));
+});
+$('keyInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('startBtn').click(); });
+$('resetkey').addEventListener('click', () => { localStorage.removeItem(KEY_STORE); localStorage.removeItem(ASSET_STORE); location.href = location.pathname + '?gate=1'; });
+
+// Auto-boot runs at the BOTTOM of this module (after all `let`/`const` below are initialized) —
+// calling boot() here would hit the temporal-dead-zone on those declarations.
+
+// =====================================================================
+//  BOOT
+// =====================================================================
+let renderer, scene, camera, tiles, car, env, dracoLoader;
+let startLatLon = PLACES[0];
+let currentCfg = null;          // { mode:'ion'|'google', token, assetId? }
+let groundPlane = null;         // fallback drive surface for OSM city-blocks (no ground mesh)
+let raycastTargets = [];        // what the car's ground-follow ray tests against
+let sky, sunLight, composer, contactShadow, pmremGen, envScene;
+
+// If your car model points the wrong way, nudge this (radians): Math.PI = 180°, Math.PI/2 = 90°
+const MODEL_YAW_OFFSET = 0;
+const TARGET_CAR_LENGTH = 3.9; // metres — real 2008 Yaris is ~3.75m; 3.9 leaves a hair of margin
+
+async function boot(cfg) {
+  try {
+    currentCfg = cfg;
+    gate.classList.add('hidden');
+    ['places','topright','hud','help','touchControls'].forEach(id => $(id).classList.remove('hidden'));
+
+    // --- Renderer ---
+    renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;   // cinematic dynamic range
+    renderer.toneMappingExposure = 1.05;
+    $('app').appendChild(renderer.domElement);
+
+    // --- Scene + real sky + sun-driven light ---
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0xcfe0ef, 1500, 12000);     // distant terrain melts into haze
+    pmremGen = new THREE.PMREMGenerator(renderer);
+    envScene = new THREE.Scene();                          // holds the sky while we bake reflections
+
+    sky = new Sky();
+    sky.scale.setScalar(450000);
+    scene.add(sky);
+    const u = sky.material.uniforms;
+    u['turbidity'].value = 6;
+    u['rayleigh'].value = 2.5;
+    u['mieCoefficient'].value = 0.005;
+    u['mieDirectionalG'].value = 0.8;
+
+    sunLight = new THREE.DirectionalLight(0xffffff, 3.0);
+    scene.add(sunLight, new THREE.HemisphereLight(0xbcd6ff, 0x4a4636, 0.7));
+    applySun();                                            // positions sun + bakes sky into the env map
+    makeContactShadow();
+
+    // --- Camera ---
+    camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 1, 80000);
+    camera.position.set(0, 20, 30);
+
+    // --- Post-processing: bloom (glow) → SMAA (clean edges) → OutputPass (tone-mapped output) ---
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.32, 0.55, 1.0)); // strength, radius, threshold
+    composer.addPass(new SMAAPass(innerWidth, innerHeight));
+    composer.addPass(new OutputPass());
+
+    // --- Shared compression loaders (Google tiles AND the car are Draco/KTX2) ---
+    dracoLoader = new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    const ktx2  = new KTX2Loader().setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/basis/').detectSupport(renderer);
+
+    await loadCar();
+    initTiles(cfg, dracoLoader, ktx2);
+
+    addEventListener('resize', onResize);
+    initControls();
+    initTouchControls();
+    initCarSwap();
+    initTune();
+    buildPlaceButtons();
+    animate();
+    $('status').textContent = 'streaming tiles…';
+  } catch (e) {
+    showError('Boot failed', e);
+  }
+}
+
+// =====================================================================
+//  TILES — the real Earth
+// =====================================================================
+function initTiles(cfg, draco, ktx2) {
+  tiles = new TilesRenderer();
+  // Auth — either free Cesium ion, or Google Maps (billing)
+  if (cfg.mode === 'ion') {
+    tiles.registerPlugin(new CesiumIonAuthPlugin({ apiToken: cfg.token, assetId: cfg.assetId, autoRefreshToken:true }));
+  } else {
+    tiles.registerPlugin(new GoogleCloudAuthPlugin({ apiToken: cfg.token, autoRefreshToken:true }));
+  }
+  // Decode the compressed tile payloads (Draco geometry + KTX2 textures)
+  tiles.registerPlugin(new GLTFExtensionsPlugin({ dracoLoader: draco, ktx2Loader: ktx2 }));
+  tiles.registerPlugin(new TileCompressionPlugin());
+  // Re-anchor the globe so our start point sits at the origin with +Y up
+  // (lets the car drive on a simple local plane instead of a spinning ECEF sphere)
+  tiles.registerPlugin(new ReorientationPlugin({
+    lat: THREE.MathUtils.degToRad(startLatLon.lat),
+    lon: THREE.MathUtils.degToRad(startLatLon.lon),
+    height: 0,
+  }));
+
+  tiles.setCamera(camera);
+  tiles.setResolutionFromRenderer(camera, renderer);
+  tiles.errorTarget = 8;             // lower = sharper tiles, more bandwidth
+  scene.add(tiles.group);
+
+  // OSM city-blocks are buildings only — no ground surface. Give the car a plane to drive on.
+  raycastTargets = [tiles.group];
+  if (groundPlane) { scene.remove(groundPlane); groundPlane = null; }
+  if (cfg.mode === 'ion' && cfg.assetId === ION_OSM) {
+    groundPlane = new THREE.Mesh(
+      new THREE.CircleGeometry(8000, 64).rotateX(-Math.PI/2),
+      new THREE.MeshStandardMaterial({ color: 0x3b4654, roughness: 1 })
+    );
+    scene.add(groundPlane);
+    raycastTargets.push(groundPlane);
+  }
+
+  tiles.addEventListener('load-error', (e) => {
+    const detail = (e.error && e.error.message) || e.error || e;
+    const hint = cfg.mode === 'ion'
+      ? '\n\nIf this is a quota/permission error on the photoreal tiles, switch to the always-free city-blocks world:'
+      : '\n\n(check: Map Tiles API enabled + billing on for this Google key)';
+    showError('Tile load error', detail + hint);
+    if (cfg.mode === 'ion') {
+      errBox.innerHTML += '<br><button onclick="window.__switchOsm()" style="margin-top:10px;background:#1a56db;border:0;color:#fff;padding:9px 13px;border-radius:9px;cursor:pointer;font-size:13px;">↺ Switch to free city-blocks</button>';
+    }
+  });
+}
+
+// Rebuild the tileset re-anchored to a new place (used by preset buttons + R)
+function jumpTo(place) {
+  startLatLon = place;
+  if (tiles) { scene.remove(tiles.group); tiles.dispose(); }
+  const draco = new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+  const ktx2  = new KTX2Loader().setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/basis/').detectSupport(renderer);
+  initTiles(currentCfg, draco, ktx2);
+  resetCar();
+  $('status').textContent = 'streaming ' + place.name + '…';
+}
+
+// =====================================================================
+//  CAR
+// =====================================================================
+const FALLBACK_CAR = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/models/gltf/ferrari.glb';
+
+// Load the car from: a dropped File → ./car.glb in this folder → Ferrari fallback.
+async function loadCar(source) {
+  const loader = new GLTFLoader().setDRACOLoader(dracoLoader);
+  let gltf, label;
+  try {
+    if (source instanceof File) {
+      gltf = await loader.parseAsync(await source.arrayBuffer(), '');
+      label = source.name;
+    } else if (await exists('./car.glb')) {
+      gltf = await loader.loadAsync('./car.glb');
+      label = 'car.glb';
+    } else {
+      gltf = await loader.loadAsync(FALLBACK_CAR);
+      label = 'Ferrari (drop your Yaris .glb to swap)';
+    }
+  } catch (e) {
+    showError('Car model failed to load — falling back to Ferrari', e);
+    gltf = await loader.loadAsync(FALLBACK_CAR);
+    label = 'Ferrari (fallback)';
+  }
+  buildCar(gltf.scene);
+  $('carname').textContent = '🚗 ' + label;
+}
+
+// Wrap, auto-fit to real car size, sit on ground, apply orientation offset.
+function buildCar(model) {
+  if (car) { scene.remove(car); }
+  car = new THREE.Group();
+  car.rotation.order = 'YXZ';      // yaw first, then pitch stays relative to heading (jump tilt)
+  const inner = new THREE.Group(); // orientation/centering happens here, drive math stays on `car`
+  model.traverse(o => { if (o.isMesh) { o.castShadow = true; if (o.material) { o.material.envMapIntensity = 1.5; o.material.needsUpdate = true; } } });
+
+  // Scale longest horizontal axis to a real Yaris length
+  const box = new THREE.Box3().setFromObject(model);
+  const size = new THREE.Vector3(); box.getSize(size);
+  const len = Math.max(size.x, size.z) || 1;
+  model.scale.setScalar(TARGET_CAR_LENGTH / len);
+
+  // Recenter on x/z, drop base to y=0
+  const box2 = new THREE.Box3().setFromObject(model);
+  const c = new THREE.Vector3(); box2.getCenter(c);
+  model.position.x -= c.x; model.position.z -= c.z; model.position.y -= box2.min.y;
+
+  inner.add(model);
+  inner.rotation.y = MODEL_YAW_OFFSET;
+  car.add(inner);
+  car.position.set(0, 2, 0);
+  scene.add(car);
+}
+
+// Tiny HEAD probe so a missing ./car.glb fails fast instead of throwing
+async function exists(url) {
+  try { const r = await fetch(url, { method:'HEAD' }); return r.ok; } catch { return false; }
+}
+
+// =====================================================================
+//  SKY / SUN / REFLECTIONS
+// =====================================================================
+const _sunDir = new THREE.Vector3();
+let _envRT = null;
+function applySun() {
+  if (!sky || !sunLight) return;
+  const el = tune.sun, az = 135;                       // elevation from slider, fixed pleasant azimuth
+  _sunDir.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - el), THREE.MathUtils.degToRad(az));
+  sky.material.uniforms['sunPosition'].value.copy(_sunDir);
+  sunLight.position.copy(_sunDir).multiplyScalar(500);
+  const t = THREE.MathUtils.clamp(el / 40, 0, 1);      // 0 = horizon (golden), 1 = high noon (white)
+  sunLight.color.setHSL(0.07 + 0.02 * t, 0.55 * (1 - t) + 0.05, 0.55);
+  sunLight.intensity = 1.4 + 2.4 * t;
+  if (scene.fog) scene.fog.color.setHSL(0.58, 0.35, 0.42 + 0.36 * t);
+  regenEnv();
+}
+// Bake the current sky into an environment map so the car + ground reflect the real sky.
+function regenEnv() {
+  if (!pmremGen || !sky) return;
+  if (_envRT) _envRT.dispose();
+  envScene.add(sky);                  // borrow the sky into the env scene
+  _envRT = pmremGen.fromScene(envScene);
+  scene.add(sky);                     // put it back as the visible backdrop
+  scene.environment = _envRT.texture;
+}
+// Soft blob shadow under the car so it reads as grounded (cheap; real tile shadows are too costly).
+function makeContactShadow() {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(64, 64, 6, 64, 64, 64);
+  g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+  contactShadow = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.5, 5.5).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false, opacity: 0.55 })
+  );
+  scene.add(contactShadow);
+}
+
+// =====================================================================
+//  CONTROLS + DRIVE PHYSICS (light "bicycle" model)
+// =====================================================================
+const keys = {};
+const DRIVE_CODES = ['KeyW','KeyS','KeyA','KeyD','ShiftLeft','ShiftRight','KeyB','ControlLeft','ControlRight','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'];
+let cockpit = false;
+let speed = 0;       // m/s, signed
+let yaw = 0;         // heading, radians
+let carY = 0;        // current ground-follow height
+let vy = 0;          // vertical velocity (jumping)
+let airborne = false;
+
+function initControls() {
+  addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (e.code === 'KeyC') cockpit = !cockpit;
+    if (e.code === 'KeyR') resetCar();
+    if (e.code === 'Space' && !e.repeat) jump();   // edge-triggered so holding ≠ auto-hop
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)) e.preventDefault();
+  });
+  addEventListener('keyup', (e) => { keys[e.code] = false; });
+  addEventListener('blur', clearDriveKeys);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) clearDriveKeys(); });
+}
+function clearDriveKeys() {
+  DRIVE_CODES.forEach(code => { keys[code] = false; });
+  document.querySelectorAll('.touch-btn.is-down').forEach(btn => btn.classList.remove('is-down'));
+}
+function initTouchControls() {
+  const wrap = $('touchControls');
+  const tapPulseMs = 160;
+  const release = (button) => {
+    if (button.dataset.key) keys[button.dataset.key] = false;
+    button.classList.remove('is-down');
+  };
+  wrap.querySelectorAll('.touch-btn').forEach(button => {
+    button.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      button.classList.add('is-down');
+      if (button.dataset.key) keys[button.dataset.key] = true;
+      if (button.dataset.action === 'jump') jump();
+      if (button.setPointerCapture) button.setPointerCapture(e.pointerId);
+    });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(type => {
+      button.addEventListener(type, (e) => { e.preventDefault(); release(button); });
+    });
+    button.addEventListener('click', () => {
+      if (!button.dataset.key) return;
+      keys[button.dataset.key] = true;
+      button.classList.add('is-down');
+      setTimeout(() => release(button), tapPulseMs);
+    });
+    button.addEventListener('contextmenu', (e) => e.preventDefault());
+  });
+}
+function jump() {
+  if (airborne) return;                            // no double-jumps
+  const big = keys['ShiftLeft'] || keys['ShiftRight'];
+  vy = big ? tune.jump * 1.6 : tune.jump;          // Shift+Space = big air
+  airborne = true;
+}
+function resetCar() { speed = 0; yaw = 0; vy = 0; airborne = false; car.position.set(0, carY || 2, 0); }
+
+// Swap the car via the button or by dragging a .glb anywhere onto the page
+function initCarSwap() {
+  $('loadcar').addEventListener('click', () => $('carfile').click());
+  $('carfile').addEventListener('change', (e) => { if (e.target.files[0]) loadCar(e.target.files[0]); });
+  const drop = $('drop');
+  addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('show'); });
+  addEventListener('dragleave', (e) => { if (e.relatedTarget === null) drop.classList.remove('show'); });
+  addEventListener('drop', (e) => {
+    e.preventDefault(); drop.classList.remove('show');
+    const f = [...e.dataTransfer.files].find(f => /\.glb$|\.gltf$/i.test(f.name));
+    if (f) loadCar(f);
+  });
+}
+
+// Live physics sliders (right panel). Writes straight into `tune`, persists to localStorage.
+function initTune() {
+  const rows = [
+    ['sjump','vjump','jump',     v => Math.round(v)],
+    ['sgrav','vgrav','gravity',  v => Math.round(v)],
+    ['sspeed','vspeed','maxSpeed', v => Math.round(v)],
+    ['sboost','vboost','boost',  v => Math.round(v)],
+    ['sgrip','vgrip','grip',     v => v.toFixed(1)],
+    ['ssun','vsun','sun',        v => Math.round(v) + '°'],
+  ];
+  const sync = () => rows.forEach(([s,v,key,fmt]) => { $(s).value = tune[key]; $(v).textContent = fmt(tune[key]); });
+  rows.forEach(([s,v,key,fmt]) => {
+    $(s).addEventListener('input', (e) => {
+      tune[key] = parseFloat(e.target.value);
+      $(v).textContent = fmt(tune[key]);
+      localStorage.setItem('realdrive.tune', JSON.stringify(tune));
+      if (key === 'sun') applySun();          // live time-of-day
+    });
+  });
+  $('tunereset').addEventListener('click', () => {
+    Object.assign(tune, TUNE_DEFAULTS);
+    localStorage.setItem('realdrive.tune', JSON.stringify(tune));
+    sync();
+  });
+  $('tunetoggle').addEventListener('click', () => $('tune').classList.toggle('hidden'));
+  sync();
+}
+
+const DRAG = 3.5, BRAKE = 48;   // BRAKE = hard stop (held), much stronger than passive coast
+const MPH_PER_MPS = 2.2369362920544;
+// Live-tunable physics — driven by the slider panel, persisted to localStorage.
+const TUNE_DEFAULTS = { jump: 11, gravity: 26, maxSpeed: 32, boost: 70, accel: 14, grip: 1.6, sun: 18 };
+const tune = Object.assign({}, TUNE_DEFAULTS, JSON.parse(localStorage.getItem('realdrive.tune') || '{}'));
+const down = new THREE.Vector3(0,-1,0);
+const ray = new THREE.Raycaster();
+ray.firstHitOnly = true;
+
+function updateCar(dt) {
+  const fwd = keys['KeyW']||keys['ArrowUp'];
+  const back = keys['KeyS']||keys['ArrowDown'];
+  const left = keys['KeyA']||keys['ArrowLeft'];
+  const right = keys['KeyD']||keys['ArrowRight'];
+  const boost = keys['ShiftLeft']||keys['ShiftRight'];
+  const brake = keys['KeyB'] || keys['ControlLeft'] || keys['ControlRight'];
+
+  const top = boost ? tune.boost : tune.maxSpeed;
+  if (fwd)  speed += tune.accel * dt;
+  if (back) speed -= tune.accel * dt;
+  if (brake) {                                       // hard brake: decelerate to 0, never cross into reverse
+    const next = speed - Math.sign(speed) * BRAKE * dt;
+    speed = (Math.sign(next) !== Math.sign(speed)) ? 0 : next;
+  }
+  if (!fwd && !back && !brake) speed -= Math.sign(speed) * DRAG * dt; // coast to stop
+  speed = THREE.MathUtils.clamp(speed, -top*0.4, top);
+  if (Math.abs(speed) < 0.05) speed = 0;
+
+  // Steering scales with motion (can't turn a parked car)
+  const steer = (left?1:0) - (right?1:0);
+  yaw += steer * tune.grip * dt * THREE.MathUtils.clamp(Math.abs(speed)/8, 0, 1) * Math.sign(speed || 1);
+
+  // Move along heading (+Z forward in local frame)
+  const heading = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+  car.position.addScaledVector(heading, speed * dt);
+  car.rotation.y = yaw;
+
+  // --- Find the surface under the car, then stick to it OR fly over it ---
+  let restY = carY + 0.4;
+  if (raycastTargets.length) {
+    ray.set(new THREE.Vector3(car.position.x, car.position.y + 200, car.position.z), down);
+    ray.far = 1000;
+    const hit = ray.intersectObjects(raycastTargets, true)[0]; // nearest downward = top surface
+    if (hit) { carY = hit.point.y; restY = carY + 0.4; }
+  }
+  if (airborne) {
+    vy -= tune.gravity * dt;      // gravity pulls the jump back down
+    car.position.y += vy * dt;
+    if (vy <= 0 && car.position.y <= restY) { car.position.y = restY; vy = 0; airborne = false; } // landed
+  } else {
+    car.position.y = THREE.MathUtils.lerp(car.position.y, restY, 0.25); // glued to ground
+  }
+  // Nose-up on the way up, nose-down falling — cheap "air" feel
+  car.rotation.x = THREE.MathUtils.lerp(car.rotation.x, airborne ? THREE.MathUtils.clamp(-vy*0.02, -0.35, 0.35) : 0, 0.2);
+
+  // Contact shadow stays on the ground; grows + fades as the car gains air
+  if (contactShadow) {
+    const h = Math.max(0, car.position.y - (carY + 0.4));
+    contactShadow.position.set(car.position.x, carY + 0.06, car.position.z);
+    contactShadow.rotation.y = yaw;
+    const s = 1 + h * 0.04;
+    contactShadow.scale.set(s, 1, s);
+    contactShadow.material.opacity = 0.55 / (1 + h * 0.12);
+  }
+
+  // --- Camera rig ---
+  const fwdV = heading.clone();
+  const up = new THREE.Vector3(0,1,0);
+  if (cockpit) {
+    const eye = car.position.clone().addScaledVector(fwdV, 0.4).addScaledVector(up, 1.25);
+    camera.position.lerp(eye, 0.5);
+    camera.lookAt(car.position.clone().addScaledVector(fwdV, 30).addScaledVector(up, 1.0));
+  } else {
+    const desired = car.position.clone().addScaledVector(fwdV, -9).addScaledVector(up, 4);
+    camera.position.lerp(desired, 0.12);
+    camera.lookAt(car.position.clone().addScaledVector(up, 1.5));
+  }
+
+  $('speed').innerHTML = Math.round(Math.abs(speed) * MPH_PER_MPS) + '<span>mph</span>';
+}
+
+// =====================================================================
+//  LOOP
+// =====================================================================
+let last = performance.now();
+let firstTilesLogged = false;
+function animate() {
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+
+  if (car) updateCar(dt);
+  if (tiles) {
+    camera.updateMatrixWorld();
+    tiles.setResolutionFromRenderer(camera, renderer);
+    tiles.update();
+    if (!firstTilesLogged && tiles.group.children.length) {
+      firstTilesLogged = true;
+      $('status').textContent = 'driving · ' + startLatLon.name;
+    }
+  }
+  composer.render();
+}
+
+function onResize() {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  if (composer) composer.setSize(innerWidth, innerHeight);
+}
+
+function buildPlaceButtons() {
+  const wrap = $('places');
+  wrap.innerHTML = '';
+  PLACES.forEach(p => {
+    const b = document.createElement('button');
+    b.textContent = p.name;
+    b.onclick = () => jumpTo(p);
+    wrap.appendChild(b);
+  });
+}
+
+// ---- Kick-off (all declarations above are now initialized) ----
+const forceGate = new URLSearchParams(location.search).has('gate');   // ?gate=1 → show the gate
+const savedKey  = localStorage.getItem(KEY_STORE) || DEFAULT_TOKEN;    // remembered, else baked default
+if (savedKey && !forceGate) boot(detectCred(savedKey));               // auto-load, skip the gate
+</script>
+</body>
+</html>

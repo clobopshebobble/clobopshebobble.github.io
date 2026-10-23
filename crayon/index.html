@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="notebook">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Messy Notebook: a draw-to-solve physics puzzle that lives in a school notebook. Draw a line, a box, a pin; the doodles obey gravity. Ring the bell.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Messy Notebook</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Messy Notebook">
+<meta name="theme-color" content="#F7F4E9">
+<link rel="apple-touch-icon" href="icons/notebook-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<!-- the Messy Notebook theme's handwriting (?theme=notebook): Patrick Hand for titles, Caveat for pencilled notes (both OFL) -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Patrick+Hand&display=swap">
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; height: 100%; background: #2a2622; overflow: hidden; }
+  body { display: grid; place-items: center; font-family: "Chalkboard SE", "Comic Sans MS", "Segoe Print", cursive; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  #stage { position: relative; width: min(100vw, calc(100dvh * 1024 / 768)); aspect-ratio: 1024 / 768; max-height: 100dvh; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; background: #f4ecd8; }
+  body.touch canvas { cursor: default; }
+  #overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(244,236,216,.96); color: #2b2b2b; text-align: center; padding: 32px; font-size: 20px; }
+  #overlay p { max-width: 42ch; margin: 8px auto; }
+  #overlay code { font: 15px ui-monospace, Menlo, monospace; background: #e8dfc8; padding: 2px 6px; border-radius: 4px; }
+
+  /* touch toolbar: the keys a phone doesn't have. Shown only on touch devices (body.touch, set by main.js).
+     A phone is wider than 4:3, so it lives in the dark bar beside the stage, a column at the right edge;
+     on a 4:3 tablet it overlaps the canvas edge instead. */
+  #toolbar { position: fixed; right: max(8px, env(safe-area-inset-right)); top: 50%; transform: translateY(-50%); display: none; flex-direction: column; gap: 8px; z-index: 5; }
+  body.touch #toolbar { display: flex; }
+  #toolbar button { width: 48px; height: 48px; border: 2px solid rgba(60,50,40,.55); border-radius: 14px; background: rgba(252,247,232,.92); color: #2b2b2b; font: 22px/1 system-ui, sans-serif; display: grid; place-items: center; box-shadow: 0 2px 0 rgba(60,50,40,.35); touch-action: manipulation; padding: 0; }
+  #toolbar button:active { transform: translateY(2px); box-shadow: none; }
+  #toolbar button[aria-pressed="true"] { background: #ffe66d; border-color: #b58900; }
+  #toolbar button { display: none; }
+  /* the Messy Notebook theme (body.notebook, set by main.js): scraps of paper, taped on, a little crooked */
+  body.notebook #toolbar button { background: #FFFDF4; border: 2px solid #253352; border-radius: 5px; box-shadow: 0 2px 0 rgba(37,51,82,.35), 0 3px 6px rgba(60,50,30,.18); transform: rotate(-2deg); }
+  body.notebook #toolbar button:nth-child(even) { transform: rotate(2deg); }
+  body.notebook #toolbar button:active { transform: translateY(2px); box-shadow: none; }
+  body.notebook #toolbar button[aria-pressed="true"] { background: #FFD447; border-color: #253352; }
+  body.notebook #toolbar button svg { display: block; }
+  body[data-mode="play"] #toolbar button.play, body[data-mode="won"] #toolbar button.play, body[data-mode="won"] #toolbar button.won, body[data-mode="map"] #toolbar button.map { display: grid; }
+
+  /* a phone held upright: the level is 4:3, ask for landscape */
+  #rotate { position: fixed; inset: 0; display: none; place-items: center; background: #f4ecd8; color: #2b2b2b; text-align: center; font-size: 26px; z-index: 10; padding: 24px; }
+  @media (orientation: portrait) and (pointer: coarse) { #rotate { display: grid; } }
+  #rotate .phone { font-size: 72px; display: inline-block; transform: rotate(90deg); animation: turn 1.6s ease-in-out infinite alternate; }
+  @keyframes turn { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }
+</style>
+</head>
+<body>
+  <div id="stage" data-mode="map">
+    <canvas id="game" width="1024" height="768" aria-label="Messy Notebook"></canvas>
+    <div id="overlay"><p>loading…</p></div>
+  </div>
+  <div id="toolbar" aria-label="controls">
+    <button class="play" id="tb-map" title="back to the map" aria-label="back to the map">🗺️</button>
+    <button class="play" id="tb-reset" title="restart the level" aria-label="restart the level">↻</button>
+    <button class="play" id="tb-eraser" title="eraser" aria-label="eraser" aria-pressed="false">🧽</button>
+    <button class="play" id="tb-rope" title="rope" aria-label="rope" aria-pressed="false">🪢</button>
+    <button class="won" id="tb-awesome" title="mark this solution awesome" aria-label="mark this solution awesome">⭐</button>
+    <button class="map" id="tb-sea" title="out to sea" aria-label="out to sea">⛵</button>
+    <button class="play map" id="tb-sound" title="sound on/off" aria-label="sound on/off">🔊</button>
+  </div>
+  <div id="rotate"><div><div class="phone">📱</div><p>turn your phone sideways</p></div></div>
+  <script src="https://cdn.jsdelivr.net/npm/planck@1.4.2/dist/planck.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/earcut@2.2.4/dist/earcut.min.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

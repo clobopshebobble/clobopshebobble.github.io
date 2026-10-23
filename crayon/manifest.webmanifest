@@ -1,0 +1,29 @@
+{
+  "name": "Messy Notebook",
+  "short_name": "Messy",
+  "description": "A draw-to-solve physics puzzle in a school notebook.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#F7F4E9",
+  "theme_color": "#F7F4E9",
+  "icons": [
+    {
+      "src": "icons/notebook-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/notebook-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/notebook-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,705 @@
+<Level version="1.7.1" >
+  <Events>
+  </Events>
+  <Background>
+    <BackgroundDrawingData>
+      <MoveBy x="0" y="0" >
+      </MoveBy>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="EEC42800" a="0" b="40" g="196" r="238" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            940,104;940,107;939,110;939,113;939,116;938,118;937,121;936,124;934,126;932,128;930,130;929,133;927,135;924,136;922,137;920,140;918,142;915,143;913,144;910,145;907,146;905,146;902,147;899,148;896,148;893,147;890,147;888,146;885,145;882,144;880,143;876,144;874,143;871,141;869,139;866,138;864,136;862,134;861,131;859,129;857,126;857,124;855,121;854,118;852,116;852,113;851,110;850,107;850,104;850,101;851,98;851,95;851,92;853,89;854,86;856,84;856,81;859,79;860,76;862,74;864,72;866,69;868,68;870,66;872,63;876,62;879,62;881,61;884,60;887,60;890,60;893,60;896,59;899,60;902,60;905,61;908,60;910,62;913,63;916,64;918,66;920,68;922,70;925,71;927,73;928,76;929,78;932,80;933,83;935,85;937,87;938,90;939,93;939,95;939,98;940,101;940,104;941,105;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            948,115;951,115;953,115;956,116;959,117;962,118;965,119;968,118;971,119;973,119;976,120;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            929,145;932,147;933,150;936,152;938,154;939,157;941,160;943,163;945,165;947,167;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            894,157;894,160;895,163;895,166;895,169;895,172;894,176;894,179;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            861,144;860,146;858,149;855,151;854,154;852,156;850,158;848,160;847,163;844,165;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            844,112;841,113;838,114;835,113;831,114;828,115;825,114;822,115;819,116;816,116;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            851,76;849,74;846,73;844,71;841,69;838,68;836,66;833,64;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            878,54;879,51;878,48;877,46;876,43;876,40;875,37;874,34;873,32;873,29;872,26;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            916,55;917,52;918,50;919,47;920,44;921,41;922,39;924,37;924,34;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DD6B1700" a="0" b="23" g="107" r="221" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            943,79;944,76;947,76;950,74;952,72;954,70;957,69;960,68;962,67;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="468CE600" a="0" b="230" g="140" r="70" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            639,201;641,204;643,207;643,209;643,212;641,213;640,216;638,218;635,218;632,218;630,219;627,221;624,220;621,220;617,221;615,221;612,221;609,221;606,222;603,222;599,223;596,223;593,224;590,225;587,227;584,228;581,229;579,230;576,233;573,234;571,236;568,237;566,237;562,239;559,239;556,239;553,237;549,236;546,234;544,233;542,231;539,229;538,228;536,226;534,224;531,223;528,221;526,219;523,217;521,216;519,214;516,213;514,212;510,211;507,208;505,205;508,201;511,199;513,197;516,196;518,194;520,192;522,190;523,188;524,185;524,182;524,178;527,178;530,178;534,179;537,178;539,179;542,180;544,180;548,179;551,180;554,179;557,179;559,177;562,176;564,174;567,174;571,173;573,171;577,169;580,169;583,167;586,166;588,166;591,164;593,164;596,164;599,163;602,164;604,165;608,164;610,167;613,168;615,170;618,171;620,173;622,176;625,178;627,180;629,184;629,186;629,189;631,192;632,193;635,195;638,197;640,199;640,200;640,199;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="468CE600" a="0" b="230" g="140" r="70" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            512,699;515,699;518,699;521,699;524,699;527,698;530,699;533,698;536,698;539,698;542,696;545,696;548,695;551,695;554,696;557,695;560,695;563,695;566,695;569,695;572,695;575,694;578,694;581,694;584,693;587,693;590,692;593,692;596,692;599,691;602,691;605,691;608,691;611,691;614,691;617,692;620,692;623,692;626,693;629,693;632,693;635,693;638,694;641,695;644,695;647,695;650,695;653,696;656,697;659,697;662,696;665,697;668,696;671,697;674,698;677,698;680,698;683,699;686,700;689,701;692,701;695,701;698,702;701,701;704,702;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="468CE600" a="0" b="230" g="140" r="70" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            320,712;323,711;326,711;329,710;332,709;335,709;338,709;341,709;344,708;347,708;350,708;353,709;356,709;359,707;362,708;365,707;368,707;371,706;374,706;377,706;380,706;383,705;386,705;389,704;392,705;395,704;398,704;401,704;404,703;407,703;410,703;413,703;416,702;419,703;422,703;425,705;428,704;431,705;434,706;437,706;440,707;443,707;446,707;449,707;452,708;455,708;458,709;461,710;464,709;467,710;470,710;473,712;476,712;479,712;482,712;485,712;488,713;491,713;494,713;497,714;500,713;503,714;506,715;509,716;512,716;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DC641E00" a="0" b="30" g="100" r="220" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            304,104;302,106;300,109;299,111;297,113;294,115;292,117;290,120;288,122;286,124;285,127;283,129;281,132;280,134;278,137;275,138;273,140;272,143;269,145;268,148;266,150;264,152;263,155;260,157;258,159;256,161;254,163;253,166;251,168;249,171;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="DC641E00" a="0" b="30" g="100" r="220" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            254,154;253,157;252,159;252,162;250,165;250,168;250,171;252,170;255,168;258,168;261,167;264,166;267,165;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+    </BackgroundDrawingData>
+    <BackgroundFile>
+      data/gfx/background_05.xml
+    </BackgroundFile>
+    <BackgroundHandler>
+    </BackgroundHandler>
+  </Background>
+  <Collectables>
+    <Collectable gfx_file="data/gfx/collectable.xml" >
+      <Position x="10.6" y="0.1" >
+      </Position>
+      <Radius>
+        1
+      </Radius>
+    </Collectable>
+  </Collectables>
+  <WallPins>
+  </WallPins>
+  <ForceObjects>
+  </ForceObjects>
+  <UserPins>
+  </UserPins>
+  <World>
+    <Bodies>
+      <Body angularDamping="0" linearDamping="0" >
+        <Position x="-11.5" y="-3.5" >
+        </Position>
+        <Rotation>
+          0
+        </Rotation>
+        <Shapes>
+          <Shape shape_type="2" >
+            <LocalPosition x="0" y="0" >
+            </LocalPosition>
+            <LocalRotation>
+              0
+            </LocalRotation>
+            <Friction>
+              0.3
+            </Friction>
+            <Restitution>
+              0.15
+            </Restitution>
+            <Density>
+              0
+            </Density>
+            <Vertices>
+              <Vertex x="-2.5" y="-9.5" >
+              </Vertex>
+              <Vertex x="2.5" y="-9.5" >
+              </Vertex>
+              <Vertex x="2.5" y="9.5" >
+              </Vertex>
+              <Vertex x="-2.5" y="9.5" >
+              </Vertex>
+            </Vertices>
+          </Shape>
+        </Shapes>
+        <Gfx type="drawing_collection" >
+          <GameSpecificData>
+            
+          </GameSpecificData>
+
+          <InitialRotation>
+            0
+          </InitialRotation>
+          <CenterPoint x="0.5" y="0.5" >
+          </CenterPoint>
+          <DrawingData>
+            <MoveBy x="0" y="0" >
+            </MoveBy>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="63A34600" a="0" b="70" g="163" r="99" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="144" y="472" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            64,168;67,168;70,168;73,168;76,168;79,168;82,169;85,168;88,168;91,169;94,168;97,167;100,168;103,167;106,168;109,168;112,167;115,167;118,167;121,168;124,167;127,167;130,167;133,167;136,168;139,167;142,167;146,166;149,166;152,166;155,166;158,167;161,167;164,167;167,167;170,167;173,168;176,166;179,166;182,167;185,166;188,166;191,166;194,167;197,167;200,168;203,168;206,168;209,168;212,167;215,168;218,167;221,167;224,167;224,171;225,174;224,177;224,180;225,183;224,186;224,189;224,192;223,195;224,198;223,201;225,204;225,207;224,210;224,213;224,216;223,219;224,222;223,225;223,228;223,231;222,234;222,237;224,240;223,243;224,246;224,249;223,252;223,255;223,258;223,261;223,264;222,267;223,270;222,273;223,276;223,279;223,282;223,285;224,288;224,291;223,294;224,297;223,300;223,303;223,306;223,309;223,312;223,315;224,318;223,321;223,324;223,327;223,330;224,333;224,336;224,339;225,342;224,345;224,348;224,351;223,354;224,357;224,360;224,363;224,366;225,369;224,372;225,375;224,378;225,381;225,384;225,387;224,390;224,393;225,396;224,399;225,402;225,405;225,408;225,411;226,414;226,417;225,420;226,423;225,426;225,429;224,432;224,435;225,438;225,441;225,444;225,447;225,450;226,453;226,456;226,459;225,462;225,465;225,468;224,471;225,473;224,476;225,479;224,482;225,485;225,488;224,491;224,494;225,497;224,500;225,503;224,506;224,509;224,512;224,515;223,518;223,521;224,524;224,527;224,530;224,533;224,536;224,539;223,542;224,545;224,548;223,551;223,554;222,557;223,560;223,563;223,566;223,569;223,572;223,575;223,578;224,581;223,584;224,587;223,590;223,593;222,596;223,599;222,602;222,605;223,608;222,611;223,614;224,617;224,620;224,623;223,626;223,629;223,632;223,635;223,638;223,641;223,644;224,647;223,650;223,653;224,656;224,659;223,662;224,665;224,668;224,671;224,674;224,677;224,680;223,683;224,686;224,689;224,692;225,695;225,698;225,701;225,704;225,707;224,710;225,713;225,716;225,719;224,722;225,725;225,728;224,731;225,734;225,737;225,740;226,743;226,746;225,749;225,752;225,755;225,758;225,761;224,764;224,767;225,770;225,773;225,776;221,778;218,777;215,778;212,777;209,778;206,778;203,777;200,776;197,777;194,776;191,776;188,776;185,776;182,777;179,776;176,777;173,777;170,777;167,776;164,776;161,775;158,775;155,775;152,775;149,776;146,775;142,776;139,776;136,776;133,776;130,775;127,776;124,775;121,776;118,775;115,775;112,774;109,775;106,775;103,775;100,776;97,776;94,775;91,776;88,775;85,775;82,775;79,775;76,774;73,775;70,775;67,774;64,775;65,773;65,770;65,767;64,764;64,761;65,758;64,755;65,752;65,749;65,746;65,743;65,740;65,737;64,734;65,731;65,728;64,725;63,722;64,719;63,716;63,713;64,710;65,707;65,704;64,701;64,698;63,695;64,692;64,689;64,686;63,683;63,680;62,677;64,674;63,671;63,668;63,665;63,662;64,659;63,656;63,653;63,650;63,647;63,644;62,641;62,638;63,635;63,632;63,629;63,626;64,623;63,620;63,617;63,614;64,611;62,608;63,605;63,602;63,599;63,596;62,593;64,590;63,587;63,584;64,581;64,578;64,575;63,572;63,569;63,566;64,563;63,560;64,557;64,554;64,551;64,548;64,545;64,542;64,539;64,536;65,533;65,530;64,527;64,524;64,521;64,518;63,515;64,512;64,509;65,506;65,503;65,500;66,497;65,494;65,491;65,488;65,485;65,482;65,479;65,476;65,473;65,471;65,468;66,465;66,462;65,459;65,456;66,453;66,450;66,447;64,444;65,441;65,438;65,435;64,432;64,429;65,426;66,423;65,420;66,417;65,414;65,411;65,408;65,405;64,402;64,399;64,396;64,393;63,390;64,387;63,384;64,381;64,378;64,375;64,372;64,369;63,366;64,363;63,360;64,357;62,354;62,351;63,348;64,345;63,342;64,339;63,336;63,333;63,330;64,327;63,324;63,321;62,318;63,315;62,312;63,309;63,306;63,303;63,300;64,297;63,294;64,291;64,288;63,285;62,282;63,279;63,276;62,273;63,270;63,267;64,264;64,261;64,258;64,255;64,252;64,249;64,246;64,243;64,240;63,237;63,234;63,231;64,228;64,225;63,222;64,219;65,216;64,213;64,210;65,207;64,204;65,201;64,198;64,195;65,192;64,189;64,186;65,183;65,180;65,177;65,174;65,171;65,168;63,167;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="66A21A00" a="0" b="26" g="162" r="102" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="0" y="0" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            66,169;69,161;69,169;71,164;72,168;74,158;74,170;76,161;76,169;79,164;80,168;83,159;82,169;84,162;85,169;87,161;88,169;91,157;93,170;95,162;97,169;100,162;101,169;102,159;105,169;108,159;108,169;110,157;110,169;113,162;114,168;117,161;117,168;119,164;120,169;123,160;123,169;126,157;127,169;129,160;131,168;133,163;134,168;137,159;137,168;140,159;140,169;142,163;144,168;146,160;146,170;149,163;149,169;150,158;152,168;154,158;157,169;159,162;160,169;162,160;162,168;165,161;165,168;168,162;169,170;172,159;171,169;172,158;173,169;175,164;177,169;178,159;181,168;182,159;183,169;184,158;188,169;190,163;190,170;192,158;193,168;194,162;197,170;200,162;200,169;203,160;202,168;204,157;204,168;207,163;207,169;209,158;211,169;213,161;214,169;215,162;217,169;220,158;220,168;223,158;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+          </DrawingData>
+        </Gfx>
+      </Body>
+      <Body angularDamping="0" linearDamping="0" >
+        <Position x="-8.4" y="-12.45" >
+        </Position>
+        <Rotation>
+          0
+        </Rotation>
+        <Shapes>
+          <Shape shape_type="2" >
+            <LocalPosition x="0" y="0" >
+            </LocalPosition>
+            <LocalRotation>
+              0
+            </LocalRotation>
+            <Friction>
+              0.3
+            </Friction>
+            <Restitution>
+              0.15
+            </Restitution>
+            <Density>
+              0
+            </Density>
+            <Vertices>
+              <Vertex x="-0.35" y="-0.25" >
+              </Vertex>
+              <Vertex x="0.35" y="-0.25" >
+              </Vertex>
+              <Vertex x="0.35" y="0.25" >
+              </Vertex>
+              <Vertex x="-0.35" y="0.25" >
+              </Vertex>
+            </Vertices>
+          </Shape>
+        </Shapes>
+        <Gfx type="drawing_collection" >
+          <GameSpecificData>
+            peg
+          </GameSpecificData>
+
+          <InitialRotation>
+            0
+          </InitialRotation>
+          <CenterPoint x="0.5" y="0.5" >
+          </CenterPoint>
+          <DrawingData>
+            <MoveBy x="0" y="0" >
+            </MoveBy>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="925E2C00" a="0" b="44" g="94" r="146" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="243.2" y="185.6" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            232,179;235,179;238,180;242,180;245,179;248,179;251,178;254,179;254,181;253,184;253,187;253,190;253,194;251,192;248,192;245,193;242,193;238,193;235,193;232,194;232,190;233,187;232,184;232,181;233,178;231,179;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+          </DrawingData>
+        </Gfx>
+      </Body>
+      <Body angularDamping="0" linearDamping="0" >
+        <Position x="10.5" y="2" >
+        </Position>
+        <Rotation>
+          0
+        </Rotation>
+        <Shapes>
+          <Shape shape_type="2" >
+            <LocalPosition x="0" y="0" >
+            </LocalPosition>
+            <LocalRotation>
+              0
+            </LocalRotation>
+            <Friction>
+              0.3
+            </Friction>
+            <Restitution>
+              0.15
+            </Restitution>
+            <Density>
+              0
+            </Density>
+            <Vertices>
+              <Vertex x="-3.5" y="-1" >
+              </Vertex>
+              <Vertex x="3.5" y="-1" >
+              </Vertex>
+              <Vertex x="3.5" y="1" >
+              </Vertex>
+              <Vertex x="-3.5" y="1" >
+              </Vertex>
+            </Vertices>
+          </Shape>
+        </Shapes>
+        <Gfx type="drawing_collection" >
+          <GameSpecificData>
+            sand
+          </GameSpecificData>
+
+          <InitialRotation>
+            0
+          </InitialRotation>
+          <CenterPoint x="0.5" y="0.5" >
+          </CenterPoint>
+          <DrawingData>
+            <MoveBy x="0" y="0" >
+            </MoveBy>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="EEC42800" a="0" b="40" g="196" r="238" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="848" y="648" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            736,616;739,616;742,617;745,617;748,615;751,616;754,616;757,617;760,617;763,617;766,617;769,617;772,618;775,617;778,617;781,616;784,616;787,617;790,617;793,617;796,618;799,617;802,618;805,617;808,617;811,617;814,617;817,617;820,617;823,617;826,616;829,617;832,618;835,617;838,618;841,617;844,617;847,617;849,616;852,617;855,616;858,616;861,617;864,616;867,617;870,617;873,616;876,616;879,616;882,616;885,615;888,615;891,616;894,615;897,616;900,616;903,616;906,616;909,615;912,615;915,614;918,614;921,615;924,614;927,616;930,615;933,615;936,615;939,616;942,615;945,615;948,615;951,614;954,614;957,615;960,615;961,619;960,622;960,625;961,628;960,631;961,634;961,637;962,640;962,643;961,646;961,650;960,653;961,656;960,659;960,662;960,665;960,668;961,671;961,674;960,677;960,680;957,680;954,681;951,680;948,680;945,679;942,679;939,680;936,680;933,679;930,680;927,679;924,680;921,679;918,679;915,679;912,678;909,678;906,679;903,679;900,679;897,679;894,680;891,679;888,679;885,679;882,679;879,678;876,679;873,679;870,679;867,678;864,679;861,679;858,680;855,679;852,679;849,678;847,679;844,679;841,678;838,679;835,679;832,679;829,679;826,680;823,680;820,680;817,679;814,680;811,679;808,680;805,679;802,680;799,680;796,681;793,681;790,681;787,680;784,680;781,681;778,681;775,680;772,680;769,680;766,680;763,681;760,682;757,682;754,682;751,682;748,681;745,680;742,681;739,681;736,681;735,677;735,674;734,671;734,668;734,665;735,662;736,659;735,656;736,653;735,650;736,646;736,643;735,640;735,637;734,634;735,631;736,628;736,625;735,622;736,619;736,616;737,615;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+          </DrawingData>
+        </Gfx>
+      </Body>
+      <Body angularDamping="0" linearDamping="0" >
+        <Position x="7.2" y="0.3" >
+        </Position>
+        <Rotation>
+          0
+        </Rotation>
+        <Shapes>
+          <Shape shape_type="2" >
+            <LocalPosition x="0" y="0" >
+            </LocalPosition>
+            <LocalRotation>
+              0
+            </LocalRotation>
+            <Friction>
+              0.3
+            </Friction>
+            <Restitution>
+              0.15
+            </Restitution>
+            <Density>
+              0
+            </Density>
+            <Vertices>
+              <Vertex x="-0.25" y="-0.8" >
+              </Vertex>
+              <Vertex x="0.25" y="-0.8" >
+              </Vertex>
+              <Vertex x="0.25" y="0.8" >
+              </Vertex>
+              <Vertex x="-0.25" y="0.8" >
+              </Vertex>
+            </Vertices>
+          </Shape>
+        </Shapes>
+        <Gfx type="drawing_collection" >
+          <GameSpecificData>
+            post_l
+          </GameSpecificData>
+
+          <InitialRotation>
+            0
+          </InitialRotation>
+          <CenterPoint x="0.5" y="0.5" >
+          </CenterPoint>
+          <DrawingData>
+            <MoveBy x="0" y="0" >
+            </MoveBy>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="925E2C00" a="0" b="44" g="94" r="146" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="742.4" y="593.6" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            734,567;738,566;741,568;744,567;747,567;750,568;750,571;751,574;752,577;751,580;751,583;751,586;751,589;752,592;751,595;752,598;752,601;751,604;751,607;752,610;751,613;751,616;751,619;747,621;744,620;741,619;738,620;734,620;734,616;734,613;733,610;733,607;733,604;734,601;733,598;733,595;734,592;734,589;733,586;734,583;733,580;734,577;734,574;734,571;735,568;735,568;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+          </DrawingData>
+        </Gfx>
+      </Body>
+      <Body angularDamping="0" linearDamping="0" >
+        <Position x="13.8" y="0.3" >
+        </Position>
+        <Rotation>
+          0
+        </Rotation>
+        <Shapes>
+          <Shape shape_type="2" >
+            <LocalPosition x="0" y="0" >
+            </LocalPosition>
+            <LocalRotation>
+              0
+            </LocalRotation>
+            <Friction>
+              0.3
+            </Friction>
+            <Restitution>
+              0.15
+            </Restitution>
+            <Density>
+              0
+            </Density>
+            <Vertices>
+              <Vertex x="-0.25" y="-0.8" >
+              </Vertex>
+              <Vertex x="0.25" y="-0.8" >
+              </Vertex>
+              <Vertex x="0.25" y="0.8" >
+              </Vertex>
+              <Vertex x="-0.25" y="0.8" >
+              </Vertex>
+            </Vertices>
+          </Shape>
+        </Shapes>
+        <Gfx type="drawing_collection" >
+          <GameSpecificData>
+            post_r
+          </GameSpecificData>
+
+          <InitialRotation>
+            0
+          </InitialRotation>
+          <CenterPoint x="0.5" y="0.5" >
+          </CenterPoint>
+          <DrawingData>
+            <MoveBy x="0" y="0" >
+            </MoveBy>
+      <DrawData is_erasable="1" version="1.3.1" >
+        <Color _hex="925E2C00" a="0" b="44" g="94" r="146" >
+        </Color>
+        <BrushFile>
+          data/gfx/crayon_brush.xml
+        </BrushFile>
+        <CenterPoint x="953.6" y="593.6" >
+        </CenterPoint>
+        <Points>
+          <DrawData>
+            946,567;949,567;952,567;955,568;958,567;962,567;963,571;963,574;963,577;962,580;963,583;962,586;962,589;962,592;961,595;961,598;962,601;962,604;962,607;962,610;961,613;962,616;962,619;958,619;955,618;952,618;949,618;946,618;947,616;946,613;946,610;946,607;946,604;946,601;946,598;946,595;947,592;948,589;947,586;947,583;948,580;947,577;947,574;947,571;946,568;946,567;
+          </DrawData>
+        </Points>
+        <UncompressedPoints>
+          <Vertices>
+          </Vertices>
+        </UncompressedPoints>
+      </DrawData>
+          </DrawingData>
+        </Gfx>
+      </Body>
+      <Body angularDamping="0" linearDamping="0" >
+        <Position x="-11.5" y="-13.75" >
+        </Position>
+        <Rotation>
+          0
+        </Rotation>
+        <Shapes>
+          <Shape shape_type="0" >
+            <LocalPosition x="0" y="0" >
+            </LocalPosition>
+            <LocalRotation>
+              0
+            </LocalRotation>
+            <Friction>
+              0.3
+            </Friction>
+            <Restitution>
+              0.3
+            </Restitution>
+            <Density>
+              1
+            </Density>
+            <Radius>
+              0.75
+            </Radius>
+          </Shape>
+        </Shapes>
+        <Gfx reset_phys_pos="1" type="file" >
+          <GameSpecificData>
+            da_ball
+          </GameSpecificData>
+          <InitialRotation>
+            0
+          </InitialRotation>
+          <CenterPoint x="0.5" y="0.5" >
+          </CenterPoint>
+          <GfxFilename>
+            data/gfx/the_ball.xml
+          </GfxFilename>
+        </Gfx>
+      </Body>
+    </Bodies>
+  </World>
+  <RopeBodies>
+  </RopeBodies>
+</Level>

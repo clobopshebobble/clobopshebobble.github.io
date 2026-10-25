@@ -802,6 +802,7 @@ export function createNotebookSfx(actx) {
   const TUNE = [0, 4, 7, 9, 7, 4, 0, -1, 2, 4, 7, 11, 9, 7, 4, -1, 0, 4, 9, 7, 4, 2, 0, -1, -3, 0, 4, 2, 0, -3, -5, -1];   // -1 = rest (semitones from C5)
   const BASS = [-24, -24, -20, -17];
   const STEP = 0.21, LOOP = TUNE.length * STEP;
+  const MUSIC_GAIN = 0.25;   // under the taps, not level with them (was 0.5; Bre 10-25: the music should sit quieter than the effects)
   let musicOn = false, nextBar = 0, timer = null, musicGain = null;
   function note(semi, at, dur, vol, type = 'sine') {
     const o = actx.createOscillator(); o.type = type; o.frequency.value = 523.25 * Math.pow(2, semi / 12);
@@ -826,10 +827,10 @@ export function createNotebookSfx(actx) {
     },
     startMusic() {
       if (musicOn || actx.state !== 'running') return false;
-      if (!musicGain) { musicGain = actx.createGain(); musicGain.gain.value = 0.5; musicGain.connect(actx.destination); }
+      if (!musicGain) { musicGain = actx.createGain(); musicGain.gain.value = MUSIC_GAIN; musicGain.connect(actx.destination); }
       musicOn = true; nextBar = actx.currentTime + 0.05; pump(); return true;
     },
-    stopMusic() { musicOn = false; if (timer) { clearTimeout(timer); timer = null; } if (musicGain) { musicGain.gain.setTargetAtTime(0.0001, actx.currentTime, 0.15); setTimeout(() => { if (!musicOn && musicGain) musicGain.gain.setValueAtTime(0.5, actx.currentTime); }, 600); } },
+    stopMusic() { musicOn = false; if (timer) { clearTimeout(timer); timer = null; } if (musicGain) { musicGain.gain.setTargetAtTime(0.0001, actx.currentTime, 0.15); setTimeout(() => { if (!musicOn && musicGain) musicGain.gain.setValueAtTime(MUSIC_GAIN, actx.currentTime); }, 600); } },
     get musicOn() { return musicOn; },
   };
 }

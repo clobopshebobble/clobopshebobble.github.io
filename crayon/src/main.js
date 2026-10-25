@@ -5,6 +5,7 @@ import { parseLevel, parseLevelList, toWorld, SCREEN_W, SCREEN_H } from './level
 import { createGame, STEP } from './world.js';
 import { createRenderer, WIN_BANNER } from './render.js';
 import { createNotebookRenderer, createNotebookSfx, TOOLBAR_ICONS, HUD_BUTTONS } from './notebook.js';
+import { createTapGate } from './taps.js';
 import { createNotebookMapArt } from './notebookmap.js';
 import { assembleMap, assembleOwnMap, MAP_FILES, LEVEL_TYPE } from './mapdata.js';
 import { createMapScreen, loadProgress } from './map.js';
@@ -79,7 +80,7 @@ else if (AC) {
   for (const name of SFX) { const a = new Audio(`${ASSETS}data/sfx/${name}`); a.preload = 'auto'; sfx.els.set(name, a); }
 }
 function unlockAudio() { if (sfx.ctx && sfx.ctx.state === 'suspended') sfx.ctx.resume().catch(() => {}); }
-let lastHit = 0;
+const tapGate = createTapGate();                 // one tap per fresh knock; a rattling stuck ball stays quiet (deluxe/src/taps.js)
 function play(name, vol = 1) {
   if (state.muted) return;
   if (sfx.synth) { sfx.synth.play(name, vol); return; }
@@ -348,8 +349,8 @@ function frame(now) {
   }
   const imp = state.game.impacts, impacts = imp.length ? imp.slice() : null;
   if (imp.length) {
-    const m = Math.max(...imp.map((i) => i.m)); imp.length = 0;
-    if (m > 1.2 && now - lastHit > 70) { lastHit = now; play(`hit_00${2 + ((Math.random() * 6) | 0)}.wav`, Math.min(1, m / 12)); }
+    const tap = tapGate.pick(imp, now); imp.length = 0;
+    if (tap) play(`hit_00${2 + ((Math.random() * 6) | 0)}.wav`, tap.vol);
   }
   if (state.message && now > state.messageUntil) state.message = '';
   renderer.render(state.game, state.level, {
@@ -364,7 +365,7 @@ function frame(now) {
 const NOTEBOOK_PROGRESS = 'messy-notebook-progress';
 async function bootNotebook() {
   say('<p>finding the notebook…</p>');
-  document.title = 'Messy Notebook';
+  document.title = document.documentElement.dataset.name || 'DoodleDood';   // the build writes data-name from GAME_NAME
   let list;
   try { list = await (await fetch('levels/index.json')).json(); } catch { say('<p>levels/index.json is missing — run <code>npm run forge</code>.</p>'); return; }
   const loaded = await Promise.all(list.map(async (e) => { try { const r = await fetch(`levels/${e.file}`); return r.ok ? { name: e.name, file: e.file, island: e.island, level: parseLevel(await r.text()), forged: true } : null; } catch { return null; } }));
